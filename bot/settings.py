@@ -75,30 +75,30 @@ WSGI_APPLICATION = 'bot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'saloon-bot',
-        'USER': 'saloon',
-        'PASSWORD': 'adminroot2025',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'CONN_MAX_AGE': 300,
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'connect_timeout': 10,
-            'init_command': "SET time_zone='+03:00'",  
-            'use_unicode': True,
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'saloon-bot',
+#         'USER': 'saloon',
+#         'PASSWORD': 'adminroot2025',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'CONN_MAX_AGE': 300,
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#             'connect_timeout': 10,
+#             'init_command': "SET time_zone='+03:00'",  
+#             'use_unicode': True,
+#         },
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
