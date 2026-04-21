@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+<body>
+    <div class="container">
+        <h3>Edit All response that user see when interact with bot</h3>
+        
+        <br />
+        <div>
+            
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
+        <!-- Form to Add a New Message -->
+        <div class="text-center">
+            <h3>Add a New Message:</h3>
+            <form method="POST" action="{% url 'response' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <input type="text" name="key" placeholder="Message Key" required />
+                <textarea name="text" placeholder="Message Text" required></textarea>
+                <select name="language" required>
+                    <option value="sw">Swahili</option>
+                    <option value="en">English</option>
+                </select>
+                <button type="submit">Add Message</button>
+            </form>
+        </div>
+
+        <!-- Displaying messages from the database -->
+        <div class="messages">
+            <h3>Messages:</h3>
+            {% for message in messages %}
+                <div class="message-item">
+                    <strong>{{ message.key }} ({{ message.language }})</strong>
+                    <p>{{ message.text }}</p>
+
+                    <!-- Update Form -->
+                    <form method="POST" action="{% url 'response' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="key" value="{{ message.key }}">
+                        <textarea name="text" required>{{ message.text }}</textarea>
+                        <select name="language" required>
+                            <option value="sw" {% if message.language == "sw" %}selected{% endif %}>Swahili</option>
+                            <option value="en" {% if message.language == "en" %}selected{% endif %}>English</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+
+                   <!-- Delete Form -->
+                    <form method="POST" action="{% url 'response' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="key" value="{{ message.key }}">
+                        <button type="submit" style="background-color: red; color: white;">Delete</button>
+                    </form> 
+                </div>
+            {% empty %}
+                <p>No messages found.</p>
+            {% endfor %}
+        </div>
+        <hr>
+</body>
+</html>

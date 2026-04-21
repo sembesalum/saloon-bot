@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jose Salon Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .booking-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem 1rem;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .salon-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .service-display,
+        .phone-display {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-display {
+            background-color: #f8f9fa;
+        }
+
+        .phone-display {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .booking-container {
+                margin: 1rem;
+                padding: 1.5rem 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-label, .phone-display h5, .service-display h5 {
+                font-size: 0.95rem;
+            }
+
+            input, textarea {
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container booking-container">
+        <div class="salon-header">
+            <h2>Jose Salon Booking</h2>
+            <p>Mwenge, Opposite Stendi Mpya</p>
+        </div>
+
+        <div class="phone-display">
+            <h5>Your Phone Number:</h5>
+            <p>{{ phone_number }}</p>
+        </div>
+
+        <div class="service-display">
+            <h5>Selected Service:</h5>
+            <p><strong>{{ service_type }}</strong> - {{ service_name }}</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="phone_number" value="{{ phone_number }}">
+            <input type="hidden" name="service_type" value="{{ service_type }}">
+            <input type="hidden" name="service_name" value="{{ service_name }}">
+
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="text" class="form-control datepicker" name="appointment_date" placeholder="Select date" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Time</label>
+                <input type="text" class="form-control timepicker" name="appointment_time" placeholder="Select time" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Your Name (optional)</label>
+                <input type="text" class="form-control" name="customer_name">
+            </div>
+
+            
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
+                Confirm Booking
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr(".datepicker", {
+            minDate: "today",
+            maxDate: new Date().fp_incr(30),
+            dateFormat: "Y-m-d",
+            disable: [
+                function(date) {
+                    return (date.getDay() === 0);
+                }
+            ]
+        });
+
+        flatpickr(".timepicker", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            minTime: "10:00",
+            maxTime: "18:00",
+            minuteIncrement: 30
+        });
+    </script>
+</body>
+</html>

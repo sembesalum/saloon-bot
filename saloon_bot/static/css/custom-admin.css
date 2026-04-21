@@ -1,0 +1,54 @@
+/* Reset some admin styles */
+#header, .breadcrumbs {
+    display: none !important;
+}
+
+/* Your custom admin styles */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container-fluid {
+    padding: 20px;
+}
+
+.payment-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .payment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+  }
+  .service-table th {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+  }
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 768px) {
+    .responsive-columns {
+      flex-direction: column-reverse;
+    }
+    .payment-section {
+      margin-bottom: 1.5rem;
+    }
+  }
+  .floating-action-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }

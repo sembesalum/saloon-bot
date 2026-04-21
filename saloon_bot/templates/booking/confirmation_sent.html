@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Booking Confirmation Sent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .confirmation-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .salon-header {
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 576px) {
+            .confirmation-container {
+                margin: 1rem;
+                padding: 1.5rem 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h4 {
+                font-size: 1.2rem;
+            }
+
+            p {
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container confirmation-container">
+        <div class="salon-header">
+            <h2>Jose Salon Booking</h2>
+            <p>Mwenge, Opposite Stendi Mpya</p>
+        </div>
+        
+        <div class="alert alert-success">
+            <h4>Booking Details Submitted!</h4>
+            <p>We've sent a confirmation message to your WhatsApp.</p>
+            <p>Please check your WhatsApp messages to complete the booking process.</p>
+        </div>
+        
+        <a href="https://wa.me/255757688966" class="btn btn-primary">Return to WhatsApp</a>
+    </div>
+</body>
+</html>

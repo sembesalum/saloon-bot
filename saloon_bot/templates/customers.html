@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Customers{% endblock %}
+{% block header %}Customers Management{% endblock %}
+{% block active_page %}customers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Total Bookings</th>
+                        <th>Last Booking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.id }}</td>
+                        <td>{{ customer.username }}</td>
+                        <td>{{ customer.phone_number|default:"-" }}</td>
+                        <td>{{ customer.email|default:"-" }}</td>
+                        <td>{{ customer.total_bookings }}</td>
+                        <td>
+                            {% if customer.last_booking %}
+                                {{ customer.last_booking|date:"M d, Y" }}
+                            {% else %}
+                                Never
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% include 'admin/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

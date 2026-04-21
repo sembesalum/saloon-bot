@@ -1,0 +1,139 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px; /* Increased width for better presentation */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+h2 {
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.text-center {
+    text-align: center;
+    margin-top: 15px;
+}
+
+button.logout {
+    width: 200px;
+    background-color: #f44336;
+}
+
+button.logout:hover {
+    background-color: #d32f2f;
+}
+
+/* New styles for displaying messages */
+.messages {
+    margin-top: 20px;
+}
+
+.message-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.message-item strong {
+    display: block;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.message-item p {
+    font-size: 1em;
+    color: #555;
+    margin-top: 10px;
+}
+
+form {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+form input,
+form select,
+form textarea,
+form button {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #45a049;
+}
+
+button[style="background-color: red; color: white;"] {
+    background-color: #f44336;
+}
+
+button[style="background-color: red; color: white;"]:hover {
+    background-color: #d32f2f;
+}
+
+
+/* Add this to your existing style section */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control, .form-select {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

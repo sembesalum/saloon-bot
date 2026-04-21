@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jose Saloon Admin - {% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        /* Mobile-first sidebar styles */
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+        }
+        
+        @media (min-width: 768px) {
+            .sidebar {
+                min-height: 100vh;
+                position: sticky;
+                top: 0;
+            }
+        }
+
+        /* Mobile menu toggle button */
+        .menu-toggle {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        @media (min-width: 768px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 999;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 15px;
+            width: 250px;
+        }
+        
+        .mobile-menu.show {
+            display: block;
+        }
+
+        /* Table responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Booking time highlight */
+        .booking-time {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 576px) {
+            .booking-time {
+                font-size: 1.1rem;
+                color: #0d6efd;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Desktop Sidebar -->
+            <div class="col-md-3 col-lg-2 d-none d-md-block sidebar py-3">
+                <div class="text-center mb-4">
+                    <h4>Jose Saloon Admin</h4>
+                    <hr>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'admin_dashboard' %}active{% endif %}" href="{% url 'saloon_admin:admin_dashboard' %}">
+                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        </a>
+                    </li>
+                   
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'services' %}active{% endif %}" href="{% url 'saloon_admin:services' %}">
+                            <i class="bi bi-scissors me-2"></i>Verify Payment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'response' %}active{% endif %}" href="{% url 'response' %}">
+                            <i class="bi bi-chat-left-text me-2"></i>Manage Responses
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item mt-3">
+                        <a class="nav-link text-danger" href="#">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main content -->
+            <main class="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 py-3">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">{% block header %}{% endblock %}</h1>
+                    {% block header_actions %}{% endblock %}
+                </div>
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+    </button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if active_page == 'admin_dashboard' %}active{% endif %}" href="{% url 'saloon_admin:admin_dashboard' %}">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if active_page == 'services' %}active{% endif %}" href="{% url 'saloon_admin:services' %}">
+                    <i class="bi bi-scissors me-2"></i>Verify Payment
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {% if active_page == 'response' %}active{% endif %}" href="{% url 'response' %}">
+                    <i class="bi bi-chat-left-text me-2"></i>Manage Responses
+                </a>
+            </li>
+            
+
+            <li class="nav-item mt-3">
+                <a class="nav-link text-danger" href="#">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (menuToggle && mobileMenu) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event from bubbling to document
+                    mobileMenu.classList.toggle('show');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function() {
+                    mobileMenu.classList.remove('show');
+                });
+                
+                // Prevent menu from closing when clicking inside it
+                mobileMenu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
