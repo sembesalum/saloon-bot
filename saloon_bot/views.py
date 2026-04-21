@@ -35,6 +35,8 @@ logger = logging.getLogger(__name__)
 
 # Session timeout in seconds (30 minutes)
 SESSION_TIMEOUT = 1800
+# Temporary switch for flow testing without charging users.
+DUMMY_PAYMENT_MODE = True
 
 
 LANGUAGES = {
@@ -3181,11 +3183,16 @@ def process_payment(phone_number, payment_phone, amount):
         # Convert Decimal to float if needed
         if isinstance(amount, Decimal):
             amount = float(amount)
+
+        if DUMMY_PAYMENT_MODE:
+            transaction_id = f"DEMO-{phone_number[-4:]}-{int(timezone.now().timestamp())}"
+            logger.info(f"Dummy payment initiated for {phone_number}: {transaction_id}")
+            return True, transaction_id, "Dummy payment created"
             
         payload = {
             'create_order': '1',
-            'buyer_email': f'{payment_phone}@josesalon.com',
-            'buyer_name': 'Jose Salon Customer',
+            'buyer_email': f'{payment_phone}@saloondemo.com',
+            'buyer_name': 'Saloon Demo Customer',
             'buyer_phone': payment_phone,
             'amount': str(amount),
             'account_id': ZENO_ACCOUNT_ID,
@@ -3347,11 +3354,16 @@ def process_payment(phone_number, payment_phone, amount):
         # Convert Decimal to float if needed
         if isinstance(amount, Decimal):
             amount = float(amount)
+
+        if DUMMY_PAYMENT_MODE:
+            transaction_id = f"DEMO-{phone_number[-4:]}-{int(timezone.now().timestamp())}"
+            logger.info(f"Dummy payment initiated for {phone_number}: {transaction_id}")
+            return True, transaction_id, "Dummy payment created"
             
         payload = {
             'create_order': '1',
-            'buyer_email': f'{payment_phone}@josesalon.com',
-            'buyer_name': 'Jose Salon Customer',
+            'buyer_email': f'{payment_phone}@saloondemo.com',
+            'buyer_name': 'Saloon Demo Customer',
             'buyer_phone': payment_phone,  # Send in 0757373765 format
             'amount': str(amount),
             'account_id': ZENO_ACCOUNT_ID,
@@ -3392,6 +3404,14 @@ class DecimalEncoder(json.JSONEncoder):
 def check_payment_status(order_id):
     """Check payment status with Zeno API"""
     try:
+        if DUMMY_PAYMENT_MODE:
+            logger.info(f"Dummy payment status completed for order: {order_id}")
+            return {
+                'status': 'success',
+                'payment_status': 'COMPLETED',
+                'order_id': order_id
+            }
+
         status_data = {
             'check_status': 1,
             'order_id': order_id,
