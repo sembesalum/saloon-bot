@@ -1,129 +1,112 @@
 {% extends "base.html" %}
-{% block title %}Services{% endblock %}
-{% block header %}Confirm Customer Payment{% endblock %}
-{% block active_page %}services{% endblock %}
+{% block title %}Verify payment{% endblock %}
+{% block header %}Verify payment{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 12px 40px rgba(67, 56, 202, 0.35);
+  }
+  .page-hero h2 { font-size: 1.15rem; font-weight: 700; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+  .page-hero p { margin: 0; opacity: 0.9; font-size: 0.875rem; max-width: 32rem; }
+  .surface-card {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  }
+  .surface-card .card-title { font-weight: 700; font-size: 1rem; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row responsive-columns">
-    <!-- Payment Verification Section -->
-    <div class="col-lg-6 payment-section">
-      <div class="card payment-card mb-4">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="card-title mb-0">
-              <i class="bi bi-credit-card-fill me-2"></i>Verify Payment
-            </h5>
-            <span class="badge bg-primary">Step 1</span>
-          </div>
+<div class="page-hero">
+  <h2><i class="bi bi-shield-check me-2"></i>Payment verification</h2>
+  <p>Enter a transaction or order ID from the customer receipt to confirm status with the payment provider.</p>
+</div>
 
-          <form method="post" action="{% url 'saloon_admin:verify_payment' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="order_id" class="form-label">Order ID</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-receipt"></i></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="order_id"
-                  name="order_id"
-                  placeholder="Enter payment reference"
-                  required
-                />
-                <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-search me-1"></i> Verify
-                </button>
-              </div>
-              <div class="form-text">
-                Enter the transaction ID from payment receipt
-              </div>
-            </div>
-          </form>
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card surface-card border-0 mb-4 mb-lg-0">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-0"><i class="bi bi-credit-card-2-front me-2 text-primary"></i>Lookup</h5>
+          <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary">Step 1</span>
         </div>
+        <form method="post" action="{% url 'saloon_admin:verify_payment' %}">
+          {% csrf_token %}
+          <label for="order_id" class="form-label small fw-semibold text-muted text-uppercase">Order / reference ID</label>
+          <div class="input-group input-group-lg flex-nowrap">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-receipt text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" id="order_id" name="order_id" placeholder="e.g. DEMO-1234-…" required>
+            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-search me-1"></i>Verify</button>
+          </div>
+          <div class="form-text mt-2">Use the ID shown on the payment confirmation or receipt.</div>
+        </form>
       </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card surface-card border-0 h-100">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-3"><i class="bi bi-activity me-2 text-primary"></i>Result</h5>
 
-      <!-- Payment Status Card -->
-      <div class="card payment-card">
-        <div class="card-body">
-          <h5 class="card-title">
-            <i class="bi bi-clock-history me-2"></i>Payment Status
-          </h5>
-          <hr />
-
-          {% if payment_response %}
-            {% if payment_response.success %}
-            <div class="alert alert-success border-0">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-check-circle-fill fs-3 me-3"></i>
-                <div>
-                  <h6 class="alert-heading mb-1">Payment Verified</h6>
-                  <p class="mb-0 small">Transaction completed successfully</p>
-                </div>
-              </div>
-
-              <hr />
-              <div class="row">
-                <div class="col-md-6">
-                  <p class="mb-1"><strong>Order ID:</strong></p>
-                  <p class="text-muted">{{ payment_response.order_id }}</p>
-                </div>
-                <div class="col-md-6">
-                  <p class="mb-1"><strong>Amount:</strong></p>
-                  <p class="text-success fw-bold">
-                    TZS {{ payment_response.amount|floatformat:2 }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="row mt-2">
-                <div class="col-md-6">
-                  <p class="mb-1"><strong>Customer:</strong></p>
-                  <p class="text-muted">
-                    {{ payment_response.customer_name|default:"N/A" }}
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <p class="mb-1"><strong>Phone:</strong></p>
-                  <p class="text-muted">
-                    {{ payment_response.customer_phone|default:"N/A" }}
-                  </p>
-                </div>
-              </div>
-
-              {% if payment_response.status == 'completed' %}
-              <div class="d-grid gap-2 mt-3">
-                <button class="btn btn-success">
-                  <i class="bi bi-check-circle me-1"></i> Mark Service Completed
-                </button>
-              </div>
-              {% endif %}
-            </div>
-            {% else %}
-            <div class="alert alert-danger border-0">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
-                <div>
-                  <h6 class="alert-heading mb-1">Verification Failed</h6>
-                  <p class="mb-0 small">{{ payment_response.message }}</p>
+        {% if payment_response %}
+          {% if payment_response.success %}
+          <div class="alert alert-success border-0 rounded-3 mb-0">
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-check-circle-fill fs-3 flex-shrink-0"></i>
+              <div class="w-100">
+                <h6 class="alert-heading fw-bold mb-1">Verified</h6>
+                <p class="mb-3 small opacity-90">Transaction completed successfully.</p>
+                <div class="row g-2 small">
+                  <div class="col-sm-6">
+                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Order</div>
+                    <div class="fw-medium">{{ payment_response.order_id }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Amount</div>
+                    <div class="fw-bold text-success">TZS {{ payment_response.amount|floatformat:2 }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Customer</div>
+                    <div>{{ payment_response.customer_name|default:"—" }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">Phone</div>
+                    <div>{{ payment_response.customer_phone|default:"—" }}</div>
+                  </div>
                 </div>
               </div>
             </div>
-            {% endif %}
+          </div>
           {% else %}
-          <div class="alert alert-info border-0">
-            <div class="d-flex align-items-center">
-              <i class="bi bi-info-circle-fill fs-3 me-3"></i>
+          <div class="alert alert-danger border-0 rounded-3 mb-0">
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-exclamation-triangle-fill fs-4 flex-shrink-0"></i>
               <div>
-                <h6 class="alert-heading mb-1">Ready to Verify</h6>
-                <p class="mb-0 small">
-                  Enter an order ID to check payment status
-                </p>
+                <h6 class="alert-heading fw-bold mb-1">Verification failed</h6>
+                <p class="mb-0 small">{{ payment_response.message }}</p>
               </div>
             </div>
           </div>
           {% endif %}
-        </div>
+        {% else %}
+          <div class="alert alert-light border rounded-3 mb-0 text-secondary">
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-info-circle fs-4 flex-shrink-0 text-primary"></i>
+              <div>
+                <h6 class="fw-bold text-dark mb-1">Ready</h6>
+                <p class="mb-0 small">Submit an order ID to see payment status here.</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -132,13 +115,9 @@
 
 {% block extra_js %}
 <script>
-  // Initialize tooltips
   document.addEventListener("DOMContentLoaded", function () {
-    var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+      new bootstrap.Tooltip(el);
     });
   });
 </script>

@@ -11,7 +11,7 @@ from django.utils import timezone
 from datetime import timedelta
 import requests
 from urllib.parse import urljoin
-from .models import AdminRegistration, Booking, Message
+from .models import AdminRegistration, Booking, Customer, Message
 from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -34,17 +34,17 @@ def user_register(request):
         # Check if any fields are missing
         if not all([email, username, phone_number, password1, password2]):
             messages.error(request, 'All fields are required.')
-            return redirect('register')
+            return redirect('saloon_admin:register')
         
         # Check if passwords match
         if password1 != password2:
             messages.error(request, 'Passwords do not match.')
-            return redirect('register')
+            return redirect('saloon_admin:register')
         
         # Check if email already exists
         if AdminRegistration.objects.filter(email=email).exists():
             messages.error(request, 'Email is already taken.')
-            return redirect('register')
+            return redirect('saloon_admin:register')
 
         # Create the new user
         try:
@@ -57,10 +57,10 @@ def user_register(request):
             user.save()
             
             messages.success(request, 'Account created successfully!')
-            return redirect('login')
+            return redirect('saloon_admin:login')
         except Exception as e:
             messages.error(request, f'Error creating account: {str(e)}')
-            return redirect('register')
+            return redirect('saloon_admin:register')
     return render(request, 'register.html')
 
 def user_login(request):
@@ -70,7 +70,7 @@ def user_login(request):
         
         if not email or not password:
             messages.error(request, 'Both fields are required.')
-            return redirect('login')
+            return redirect('saloon_admin:login')
         
         try:
             user = AdminRegistration.objects.get(email=email)
@@ -78,7 +78,7 @@ def user_login(request):
                 # Successful login
                 request.session['user_id'] = user.id  # Set user in session
                 messages.success(request, 'Login successful!')
-                return redirect('admin_dashboard')  # Redirect to the response page
+                return redirect('saloon_admin:admin_dashboard')
             else:
                 messages.error(request, 'Invalid password.')
         except AdminRegistration.DoesNotExist:
@@ -89,7 +89,7 @@ def user_login(request):
 def admin_logout(request):
     request.session.flush()
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('login')
+    return redirect('saloon_admin:login')
 
 @login_required
 def admin_dashboard(request):
@@ -157,11 +157,14 @@ def manage_messages(request):
             except Message.DoesNotExist:
                 messages.error(request, f'Message with key {key} does not exist.')
         
-        return redirect('response')  # Redirect back to the response page with updated data
+        return redirect('saloon_admin:response')
 
     # Fetch all messages to display
     messages_list = Message.objects.all()
-    return render(request, 'response.html', {'messages': messages_list})
+    return render(request, 'response.html', {
+        'message_list': messages_list,
+        'active_page': 'response',
+    })
 
 def get_message(key, language="sw", **variables):
     """Retrieve localized message with optional variable substitution"""
@@ -244,8 +247,18 @@ def check_customer_payment_status(order_id):
 
 
 def customers(request):
-    # Add your customer data fetching logic here
-    return render(request, 'customers.html', {'active_page': 'customers'})
+    rows = []
+    for customer in Customer.objects.order_by('-join_date'):
+        bq = Booking.objects.filter(customer_phone=customer.phone_number)
+        rows.append({
+            'customer': customer,
+            'total_bookings': bq.count(),
+            'last_booking': bq.order_by('-appointment_date').first(),
+        })
+    return render(request, 'customers.html', {
+        'customer_rows': rows,
+        'active_page': 'customers',
+    })
 
 # def services(request):
 #     # Add your services data fetching logic here

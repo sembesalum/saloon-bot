@@ -3026,21 +3026,21 @@ def api_bookings(request):
     
 def booking_detail(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    return render(request, 'admin/booking_detail.html', {'booking': booking})
-
-def edit_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
-    if request.method == 'POST':
-        # Handle form submission
+    customer = None
+    customer_booking_count = 0
+    try:
+        customer = Customer.objects.get(phone_number=booking.customer_phone)
+        customer_booking_count = Booking.objects.filter(
+            customer_phone=customer.phone_number
+        ).count()
+    except Customer.DoesNotExist:
         pass
-    return render(request, 'admin/edit_booking.html', {'booking': booking})
-
-def delete_booking(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
-    if request.method == 'POST':
-        booking.delete()
-        return redirect('saloon_admin:bookings')
-    return render(request, 'admin/delete_booking.html', {'booking': booking})
+    return render(request, 'booking_detail.html', {
+        'booking': booking,
+        'customer': customer,
+        'customer_booking_count': customer_booking_count,
+        'active_page': 'admin_dashboard',
+    })
 
 def booking_form(request, phone_number, token):
     try:
@@ -3179,11 +3179,14 @@ def delete_booking(request, booking_id):
         booking = get_object_or_404(Booking, id=booking_id)
         booking.delete()
         messages.success(request, 'Booking deleted successfully!')
-        return redirect('admin_dashboard')  # Using the correct name
+        return redirect('saloon_admin:admin_dashboard')
     
     # GET request shows confirmation page
     booking = get_object_or_404(Booking, id=booking_id)
-    return render(request, 'confirm_delete.html', {'booking': booking})
+    return render(request, 'confirm_delete.html', {
+        'booking': booking,
+        'active_page': 'admin_dashboard',
+    })
 
 def process_payment(phone_number, payment_phone, amount):
     """Process payment through Zeno USSD endpoint"""
@@ -3453,12 +3456,13 @@ def edit_booking(request, booking_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Booking updated successfully!')
-            return redirect('admin_dashboard')  # Using the URL name
+            return redirect('saloon_admin:admin_dashboard')
     else:
         form = BookingForm(instance=booking)
     
     context = {
         'form': form,
         'booking': booking,
+        'active_page': 'admin_dashboard',
     }
     return render(request, 'booking/edit_booking.html', context)

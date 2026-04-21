@@ -3,127 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saloon Demo Booking</title>
+    <title>Saloon Demo — Book</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         body {
-            background-color: #f0f2f5;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 45%, #fff 100%);
         }
-
-        .booking-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem 1rem;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        .booking-wrap {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 2.5rem;
         }
-
-        .salon-header {
+        .booking-card {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.2);
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+        .booking-hero {
+            background: linear-gradient(135deg, #312e81 0%, #6366f1 100%);
+            color: #fff;
+            padding: 1.5rem 1.25rem;
             text-align: center;
-            margin-bottom: 2rem;
         }
-
-        .service-display,
-        .phone-display {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1.5rem;
+        .booking-hero h1 {
+            font-size: clamp(1.25rem, 4vw, 1.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 0.35rem;
         }
-
-        .service-display {
-            background-color: #f8f9fa;
+        .booking-hero p { margin: 0; opacity: 0.9; font-size: 0.875rem; }
+        .info-tile {
+            border-radius: 0.75rem;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1rem;
         }
-
-        .phone-display {
-            background-color: #e9ecef;
-            font-weight: bold;
+        .info-tile.phone {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border: 1px solid #e2e8f0;
         }
-
-        @media (max-width: 576px) {
-            .booking-container {
-                margin: 1rem;
-                padding: 1.5rem 1rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .form-label, .phone-display h5, .service-display h5 {
-                font-size: 0.95rem;
-            }
-
-            input, textarea {
-                font-size: 0.95rem;
-            }
-
-            .btn {
-                font-size: 1rem;
-            }
+        .info-tile.service {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
         }
+        .info-tile h2 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+        }
+        .booking-body { padding: 1.25rem 1.25rem 1.5rem; }
+        @media (min-width: 576px) {
+            .booking-body { padding: 1.5rem 1.75rem 1.75rem; }
+        }
+        .form-label { font-weight: 600; font-size: 0.85rem; color: #475569; }
+        .form-control { border-radius: 0.65rem; border-color: #e2e8f0; }
+        .form-control:focus { border-color: #818cf8; box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.18); }
+        .btn-submit {
+            border-radius: 0.75rem;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            border: none;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #4338ca, #3730a3); }
     </style>
 </head>
 <body>
-    <div class="container booking-container">
-        <div class="salon-header">
-            <h2>Saloon Demo Booking</h2>
-            <p>Mwenge, Opposite Stendi Mpya</p>
-        </div>
-
-        <div class="phone-display">
-            <h5>Your Phone Number:</h5>
-            <p>{{ phone_number }}</p>
-        </div>
-
-        <div class="service-display">
-            <h5>Selected Service:</h5>
-            <p><strong>{{ service_type }}</strong> - {{ service_name }}</p>
-        </div>
-
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="phone_number" value="{{ phone_number }}">
-            <input type="hidden" name="service_type" value="{{ service_type }}">
-            <input type="hidden" name="service_name" value="{{ service_name }}">
-
-            <div class="mb-3">
-                <label class="form-label">Date</label>
-                <input type="text" class="form-control datepicker" name="appointment_date" placeholder="Select date" required>
+    <div class="booking-wrap">
+        <div class="booking-card">
+            <div class="booking-hero">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-25 mb-2" style="width:3rem;height:3rem;">
+                    <i class="bi bi-droplet-half fs-4"></i>
+                </div>
+                <h1>Saloon Demo</h1>
+                <p>Complete your appointment</p>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Time</label>
-                <input type="text" class="form-control timepicker" name="appointment_time" placeholder="Select time" required>
+            <div class="booking-body">
+                {% if error %}
+                <div class="alert alert-danger rounded-3 small mb-3">{{ error }}</div>
+                {% endif %}
+                <div class="info-tile phone">
+                    <h2><i class="bi bi-phone me-1"></i>Your number</h2>
+                    <p class="mb-0 fw-semibold fs-5">{{ phone_number }}</p>
+                </div>
+                <div class="info-tile service">
+                    <h2><i class="bi bi-scissors me-1"></i>Service</h2>
+                    <p class="mb-0"><strong>{{ service_type }}</strong> — {{ service_name }}</p>
+                    {% if price %}<p class="small text-muted mb-0 mt-1">TZS {{ price }}</p>{% endif %}
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="phone_number" value="{{ phone_number }}">
+                    <input type="hidden" name="service_type" value="{{ service_type }}">
+                    <input type="hidden" name="service_name" value="{{ service_name }}">
+                    <div class="mb-3">
+                        <label class="form-label" for="appt-date">Date</label>
+                        <input type="text" class="form-control datepicker" id="appt-date" name="appointment_date" placeholder="Pick a date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="appt-time">Time</label>
+                        <input type="text" class="form-control timepicker" id="appt-time" name="appointment_time" placeholder="Pick a time" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="cust-name">Your name <span class="fw-normal text-muted">(optional)</span></label>
+                        <input type="text" class="form-control" id="cust-name" name="customer_name" placeholder="How we should greet you">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-submit w-100 text-white">Confirm booking</button>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Your Name (optional)</label>
-                <input type="text" class="form-control" name="customer_name">
-            </div>
-
-            
-
-            <button type="submit" class="btn btn-primary w-100 py-2">
-                Confirm Booking
-            </button>
-        </form>
+        </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         flatpickr(".datepicker", {
             minDate: "today",
             maxDate: new Date().fp_incr(30),
             dateFormat: "Y-m-d",
-            disable: [
-                function(date) {
-                    return (date.getDay() === 0);
-                }
-            ]
+            disable: [function (date) { return date.getDay() === 0; }]
         });
-
         flatpickr(".timepicker", {
             enableTime: true,
             noCalendar: true,

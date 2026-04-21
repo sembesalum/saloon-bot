@@ -1,120 +1,83 @@
-{% extends "admin/base.html" %}
-
+{% extends "base.html" %}
 {% block title %}Booking #{{ booking.id }}{% endblock %}
-{% block header %}Booking Details{% endblock %}
-{% block active_page %}bookings{% endblock %}
+{% block header %}Booking #{{ booking.id }}{% endblock %}
 
 {% block header_actions %}
 <div class="btn-group">
-    <a href="{% url 'saloon_admin:edit_booking' booking.id %}" class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-pencil"></i> Edit
-    </a>
-    <a href="{% url 'saloon_admin:delete_booking' booking.id %}" class="btn btn-sm btn-outline-danger">
-        <i class="bi bi-trash"></i> Delete
-    </a>
+  <a href="{% url 'saloon_admin:edit_booking' booking.id %}" class="btn btn-sm btn-outline-primary rounded-start-3">
+    <i class="bi bi-pencil-square"></i> Edit
+  </a>
+  <a href="{% url 'saloon_admin:delete_booking' booking.id %}" class="btn btn-sm btn-outline-danger rounded-end-3">
+    <i class="bi bi-trash"></i> Delete
+  </a>
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+  .detail-card {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+  .detail-card .card-header {
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .detail-card th { width: 38%; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Booking Information</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th>Booking ID</th>
-                            <td>{{ booking.id }}</td>
-                        </tr>
-                        <tr>
-                            <th>Customer Name</th>
-                            <td>{{ booking.customer_name|default:"-" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Phone Number</th>
-                            <td>{{ booking.customer_phone }}</td>
-                        </tr>
-                        <tr>
-                            <th>Service Type</th>
-                            <td>{{ booking.service_type }}</td>
-                        </tr>
-                        <tr>
-                            <th>Service Name</th>
-                            <td>{{ booking.service_name }}</td>
-                        </tr>
-                        <tr>
-                            <th>Appointment Date</th>
-                            <td>{{ booking.appointment_date|date:"M d, Y H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Price</th>
-                            <td>
-                                {% if booking.price %}
-                                    TZS {{ booking.price|floatformat:2 }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Status</th>
-                            <td>
-                                <span class="badge 
-                                    {% if booking.status == 'confirmed' %}bg-success
-                                    {% elif booking.status == 'pending' %}bg-warning
-                                    {% elif booking.status == 'completed' %}bg-info
-                                    {% else %}bg-danger{% endif %}">
-                                    {{ booking.get_status_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Created At</th>
-                            <td>{{ booking.created_at|date:"M d, Y H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Notes</th>
-                            <td>{{ booking.notes|default:"-" }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="detail-card card border-0 h-100">
+      <div class="card-header py-3">Booking</div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr><th class="ps-4 py-3">ID</th><td class="py-3 pe-4">{{ booking.id }}</td></tr>
+            <tr><th class="ps-4 py-3">Customer</th><td class="py-3 pe-4">{{ booking.customer_name|default:"—" }}</td></tr>
+            <tr><th class="ps-4 py-3">Phone</th><td class="py-3 pe-4">{{ booking.customer_phone }}</td></tr>
+            <tr><th class="ps-4 py-3">Service type</th><td class="py-3 pe-4">{{ booking.service_type }}</td></tr>
+            <tr><th class="ps-4 py-3">Service</th><td class="py-3 pe-4">{{ booking.service_name }}</td></tr>
+            <tr><th class="ps-4 py-3">Appointment</th><td class="py-3 pe-4">{{ booking.appointment_date|date:"M d, Y H:i" }}</td></tr>
+            <tr><th class="ps-4 py-3">Price</th><td class="py-3 pe-4">{% if booking.price %}TZS {{ booking.price|floatformat:2 }}{% else %}—{% endif %}</td></tr>
+            <tr><th class="ps-4 py-3">Status</th><td class="py-3 pe-4">
+              <span class="badge rounded-pill {% if booking.status == 'confirmed' %}text-bg-primary{% elif booking.status == 'pending' %}text-bg-warning{% elif booking.status == 'completed' %}text-bg-success{% else %}text-bg-danger{% endif %}">{{ booking.get_status_display }}</span>
+            </td></tr>
+            <tr><th class="ps-4 py-3">Created</th><td class="py-3 pe-4">{{ booking.created_at|date:"M d, Y H:i" }}</td></tr>
+            <tr><th class="ps-4 py-3 align-top">Notes</th><td class="py-3 pe-4">{{ booking.notes|default:"—"|linebreaksbr }}</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Customer Information</h5>
-            </div>
-            <div class="card-body">
-                {% if customer %}
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th>Name</th>
-                            <td>{{ customer.name|default:"-" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Phone</th>
-                            <td>{{ customer.phone }}</td>
-                        </tr>
-                        <tr>
-                            <th>Total Bookings</th>
-                            <td>{{ customer.bookings.count }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="alert alert-info">
-                    No additional customer information available.
-                </div>
-                {% endif %}
-            </div>
+  </div>
+  <div class="col-md-6">
+    <div class="detail-card card border-0 h-100">
+      <div class="card-header py-3">Customer profile</div>
+      <div class="card-body">
+        {% if customer %}
+        <table class="table table-sm mb-0">
+          <tbody>
+            <tr><th>Name</th><td>{{ customer.name|default:"—" }}</td></tr>
+            <tr><th>Phone</th><td>{{ customer.phone_number }}</td></tr>
+            <tr><th>Language</th><td>{{ customer.language|upper }}</td></tr>
+            <tr><th>Bookings (same phone)</th><td class="fw-bold">{{ customer_booking_count }}</td></tr>
+            <tr><th>Joined</th><td>{{ customer.join_date|date:"M d, Y" }}</td></tr>
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-light border rounded-3 mb-0 text-secondary small">
+          <i class="bi bi-info-circle me-1"></i>No matching customer record for this phone number.
         </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

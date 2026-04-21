@@ -1,71 +1,101 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-</head>
-<body>
-    <div class="container">
-        <h3>Edit All response that user see when interact with bot</h3>
-        
-        <br />
-        <div>
-            
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+{% extends "base.html" %}
+{% block title %}Bot messages{% endblock %}
+{% block header %}Bot messages{% endblock %}
+
+{% block extra_css %}
+<style>
+  .msg-hero {
+    background: linear-gradient(135deg, #312e81 0%, #6366f1 100%);
+    color: #fff;
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3);
+  }
+  .msg-hero h2 { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.35rem; }
+  .msg-hero p { margin: 0; opacity: 0.9; font-size: 0.875rem; max-width: 36rem; }
+  .add-card, .msg-item {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  }
+  .msg-item { margin-bottom: 1rem; }
+  .msg-item .key-badge {
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="msg-hero">
+  <h2><i class="bi bi-chat-dots me-2"></i>Copy the bot speaks</h2>
+  <p>Add, update, or remove localized strings used in WhatsApp replies. Keys must stay unique per language.</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="add-card p-4 h-100">
+      <h3 class="h6 fw-bold text-uppercase text-muted mb-3">Add message</h3>
+      <form method="post" action="{% url 'saloon_admin:response' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Key</label>
+          <input type="text" class="form-control" name="key" placeholder="e.g. karibu" required>
         </div>
-
-        <!-- Form to Add a New Message -->
-        <div class="text-center">
-            <h3>Add a New Message:</h3>
-            <form method="POST" action="{% url 'response' %}">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add">
-                <input type="text" name="key" placeholder="Message Key" required />
-                <textarea name="text" placeholder="Message Text" required></textarea>
-                <select name="language" required>
-                    <option value="sw">Swahili</option>
-                    <option value="en">English</option>
-                </select>
-                <button type="submit">Add Message</button>
-            </form>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Text</label>
+          <textarea class="form-control" name="text" rows="4" required placeholder="Message shown to the user…"></textarea>
         </div>
-
-        <!-- Displaying messages from the database -->
-        <div class="messages">
-            <h3>Messages:</h3>
-            {% for message in messages %}
-                <div class="message-item">
-                    <strong>{{ message.key }} ({{ message.language }})</strong>
-                    <p>{{ message.text }}</p>
-
-                    <!-- Update Form -->
-                    <form method="POST" action="{% url 'response' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="update">
-                        <input type="hidden" name="key" value="{{ message.key }}">
-                        <textarea name="text" required>{{ message.text }}</textarea>
-                        <select name="language" required>
-                            <option value="sw" {% if message.language == "sw" %}selected{% endif %}>Swahili</option>
-                            <option value="en" {% if message.language == "en" %}selected{% endif %}>English</option>
-                        </select>
-                        <button type="submit">Update</button>
-                    </form>
-
-                   <!-- Delete Form -->
-                    <form method="POST" action="{% url 'response' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="key" value="{{ message.key }}">
-                        <button type="submit" style="background-color: red; color: white;">Delete</button>
-                    </form> 
-                </div>
-            {% empty %}
-                <p>No messages found.</p>
-            {% endfor %}
+        <div class="mb-4">
+          <label class="form-label small fw-semibold">Language</label>
+          <select class="form-select" name="language" required>
+            <option value="sw">Swahili</option>
+            <option value="en">English</option>
+          </select>
         </div>
-        <hr>
-</body>
-</html>
+        <button type="submit" class="btn btn-primary w-100 rounded-3"><i class="bi bi-plus-lg me-1"></i>Add</button>
+      </form>
+      <a href="{% url 'saloon_admin:admin_dashboard' %}" class="btn btn-outline-secondary w-100 rounded-3 mt-3">
+        <i class="bi bi-arrow-left me-1"></i>Back to dashboard
+      </a>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <h3 class="h6 fw-bold text-uppercase text-muted mb-3">Existing messages</h3>
+    {% for message in message_list %}
+    <div class="msg-item p-4">
+      <div class="d-flex flex-wrap justify-content-between gap-2 align-items-start mb-2">
+        <span class="key-badge fw-bold text-primary">{{ message.key }}</span>
+        <span class="badge text-bg-light border">{{ message.language|upper }}</span>
+      </div>
+      <div class="border rounded-3 p-3 mb-3 bg-light small">{{ message.text|safe }}</div>
+      <form method="post" action="{% url 'saloon_admin:response' %}" class="mb-3">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="key" value="{{ message.key }}">
+        <label class="form-label small fw-semibold">Update text</label>
+        <textarea class="form-control mb-2" name="text" rows="3" required>{{ message.text }}</textarea>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <select class="form-select form-select-sm" style="max-width: 10rem" name="language" required>
+            <option value="sw" {% if message.language == "sw" %}selected{% endif %}>Swahili</option>
+            <option value="en" {% if message.language == "en" %}selected{% endif %}>English</option>
+          </select>
+          <button type="submit" class="btn btn-sm btn-primary rounded-3">Save</button>
+        </div>
+      </form>
+      <form method="post" action="{% url 'saloon_admin:response' %}" onsubmit="return confirm('Delete this message?');">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="key" value="{{ message.key }}">
+        <button type="submit" class="btn btn-sm btn-outline-danger rounded-3"><i class="bi bi-trash me-1"></i>Delete</button>
+      </form>
+    </div>
+    {% empty %}
+    <div class="text-center text-muted py-5 rounded-4 border border-dashed">No messages yet. Add one on the left.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
