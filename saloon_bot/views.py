@@ -104,7 +104,7 @@ def handle_verification(request):
 
 
 def send_booking_link(phone_number):
-    booking_url = f"https://joseapi.invict.site/book/{phone_number}/"
+    booking_url = f"https://oldonyotech.pythonanywhere.com/book/{phone_number}/"
     message = get_message('bonyeza_link')
     send_text_message(phone_number, message)
 
@@ -1666,7 +1666,7 @@ def confirm_booking(phone_number, session):
             price=booking_details.get('price', None)
         )
 
-        booking_url = f"https://joseapi.invict.site/book/{phone_number}/{token}/"
+        booking_url = f"https://oldonyotech.pythonanywhere.com/book/{phone_number}/{token}/"
         
         if language == 'en':
             # English version of the confirmation message
