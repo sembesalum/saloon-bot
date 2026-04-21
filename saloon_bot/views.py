@@ -2953,14 +2953,22 @@ def handle_menu_redispatch(phone_number, session):
         
         
 def admin_dashboard(request):
-    bookings = Booking.objects.all().order_by('-appointment_date')[:10]
+    bookings = Booking.objects.all().order_by('-appointment_date')[:200]
     recent_customers = Customer.objects.all().order_by('-join_date')[:5]
-    
+    status_counts = {
+        'all': Booking.objects.count(),
+        'pending': Booking.objects.filter(status='pending').count(),
+        'confirmed': Booking.objects.filter(status='confirmed').count(),
+        'completed': Booking.objects.filter(status='completed').count(),
+        'cancelled': Booking.objects.filter(status='cancelled').count(),
+    }
     context = {
         'bookings': bookings,
         'recent_customers': recent_customers,
         'total_bookings': Booking.objects.count(),
         'total_customers': Customer.objects.count(),
+        'status_counts': status_counts,
+        'active_page': 'admin_dashboard',
     }
     return render(request, 'admin/dashboard.html', context)
 

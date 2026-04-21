@@ -1,88 +1,342 @@
 {% extends 'base.html' %}
-<!-- Assuming you have a base template -->
+
+{% block title %}Dashboard{% endblock %}
+{% block header %}Bookings{% endblock %}
+
+{% block extra_css %}
+<style>
+  .dashboard-shell {
+    --dash-accent: #6366f1;
+    --dash-accent-soft: rgba(99, 102, 241, 0.12);
+    --dash-surface: #ffffff;
+    --dash-border: rgba(15, 23, 42, 0.08);
+    --dash-muted: #64748b;
+    --dash-heading: #0f172a;
+  }
+
+  .dashboard-hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4338ca 100%);
+    border-radius: 1rem;
+    color: #fff;
+    padding: 1.5rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 12px 40px rgba(49, 46, 129, 0.35);
+  }
+
+  @media (min-width: 768px) {
+    .dashboard-hero {
+      padding: 1.75rem 2rem;
+      border-radius: 1.25rem;
+    }
+  }
+
+  .dashboard-hero h2 {
+    font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .dashboard-hero p {
+    margin: 0;
+    opacity: 0.88;
+    font-size: 0.9rem;
+    max-width: 36rem;
+  }
+
+  .stat-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 0.875rem;
+    padding: 1rem 1.1rem;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  }
+
+  .stat-card .icon-wrap {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+
+  .stat-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dash-heading);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .stat-card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dash-muted);
+    font-weight: 600;
+  }
+
+  .toolbar-card {
+    border: 1px solid var(--dash-border);
+    border-radius: 1rem;
+    background: var(--dash-surface);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  }
+
+  #statusTabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.35rem;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  #statusTabs .nav-link {
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--dash-muted);
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  #statusTabs .nav-link:hover {
+    background: rgba(15, 23, 42, 0.05);
+    color: var(--dash-heading);
+  }
+
+  #statusTabs .nav-link.active {
+    background: var(--dash-accent-soft);
+    color: var(--dash-accent);
+    border-color: rgba(99, 102, 241, 0.25);
+  }
+
+  #statusTabs .nav-link .count {
+    opacity: 0.85;
+    font-weight: 700;
+  }
+
+  .date-filter-group .form-control {
+    border-radius: 0.65rem;
+    border-color: var(--dash-border);
+    max-width: 100%;
+  }
+
+  @media (min-width: 576px) {
+    .date-filter-group .form-control {
+      max-width: 11rem;
+    }
+  }
+
+  .table-card {
+    border: 1px solid var(--dash-border);
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--dash-surface);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  }
+
+  .table-card .table thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    color: var(--dash-muted);
+    border-bottom-width: 1px;
+    background: rgba(248, 250, 252, 0.9);
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .table-card .table tbody td {
+    vertical-align: middle;
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+  }
+
+  .table-card .table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.04);
+  }
+
+  .booking-mobile-card {
+    border: 1px solid var(--dash-border);
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--dash-surface);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .booking-mobile-card:hover {
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
+  }
+
+  .booking-mobile-card .card-body {
+    padding: 1rem 1.1rem;
+  }
+
+  .badge-status {
+    font-weight: 600;
+    padding: 0.4em 0.65em;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    border: 2px dashed var(--dash-border);
+    border-radius: 1rem;
+    background: rgba(248, 250, 252, 0.6);
+  }
+
+  .empty-state i {
+    font-size: 2.5rem;
+    color: var(--dash-muted);
+    opacity: 0.5;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Booking Dashboard</h2>
-    
+<div class="dashboard-shell">
+  <div class="dashboard-hero">
+    <h2>Booking overview</h2>
+    <p>Filter by status and date, then edit or remove entries. Layout adapts from phones to large screens.</p>
   </div>
 
-  {% if messages %} {% for message in messages %}
-  <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-    {{ message }}
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
-  </div>
-  {% endfor %} {% endif %}
-
-  <!-- Status Tabs - Now using JavaScript filtering -->
-  <ul class="nav nav-tabs mb-4" id="statusTabs">
-    <li class="nav-item">
-      <a class="nav-link active" href="#" data-status="all"
-        >All (<span class="count">{{ status_counts.all }}</span>)</a
-      >
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#" data-status="pending"
-        >Pending (<span class="count">{{ status_counts.pending }}</span>)</a
-      >
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#" data-status="confirmed"
-        >Confirmed (<span class="count">{{ status_counts.confirmed }}</span>)</a
-      >
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#" data-status="completed"
-        >Completed (<span class="count">{{ status_counts.completed }}</span>)</a
-      >
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#" data-status="cancelled"
-        >Cancelled (<span class="count">{{ status_counts.cancelled }}</span>)</a
-      >
-    </li>
-  </ul>
-
-  <!-- Date Filter (Client-side) -->
-  <div class="mb-4">
-    <div class="form-group">
-      <label for="dateFilter">Filter by Date:</label>
-      <input
-        type="date"
-        id="dateFilter"
-        class="form-control"
-        onchange="filterBookings()"
-      />
-      <button
-        id="clearDateFilter"
-        class="btn btn-sm btn-secondary mt-2"
-        style="display: none"
-        onclick="clearDateFilter()"
-      >
-        Clear Date Filter
-      </button>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-wrap bg-primary bg-opacity-10 text-primary">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+          <div>
+            <div class="label">Total bookings</div>
+            <div class="value">{{ total_bookings }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-wrap bg-success bg-opacity-10 text-success">
+            <i class="bi bi-people"></i>
+          </div>
+          <div>
+            <div class="label">Customers</div>
+            <div class="value">{{ total_customers }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-wrap bg-warning bg-opacity-10 text-warning">
+            <i class="bi bi-hourglass-split"></i>
+          </div>
+          <div>
+            <div class="label">Pending</div>
+            <div class="value">{{ status_counts.pending }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-center gap-3">
+          <div class="icon-wrap bg-info bg-opacity-10 text-info">
+            <i class="bi bi-check2-circle"></i>
+          </div>
+          <div>
+            <div class="label">Completed</div>
+            <div class="value">{{ status_counts.completed }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Responsive Booking Table -->
-  <div class="d-none d-lg-block">
-    <!-- Desktop View -->
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="toolbar-card mb-4">
+    <div class="card-body p-3 p-md-4">
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small text-uppercase fw-bold text-muted letter-spacing-1">Status</span>
+          </div>
+          <ul class="nav nav-pills mb-0" id="statusTabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" data-status="all">All <span class="count">({{ status_counts.all }})</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-status="pending">Pending <span class="count">({{ status_counts.pending }})</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-status="confirmed">Confirmed <span class="count">({{ status_counts.confirmed }})</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-status="completed">Completed <span class="count">({{ status_counts.completed }})</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-status="cancelled">Cancelled <span class="count">({{ status_counts.cancelled }})</span></a>
+            </li>
+          </ul>
+        </div>
+        <hr class="my-0 text-muted opacity-25">
+        <div class="d-flex flex-column flex-sm-row flex-wrap align-items-stretch align-items-sm-end gap-2 date-filter-group">
+          <div class="flex-grow-1 flex-sm-grow-0">
+            <label for="dateFilter" class="form-label small text-uppercase fw-bold text-muted mb-1">Filter by date</label>
+            <input type="date" id="dateFilter" class="form-control form-control-sm" onchange="filterBookings()" />
+          </div>
+          <button type="button" id="clearDateFilter" class="btn btn-sm btn-outline-secondary rounded-3" style="display: none" onclick="clearDateFilter()">
+            <i class="bi bi-x-lg me-1"></i> Clear date
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if bookings %}
+  <div class="d-none d-lg-block table-card mb-4">
     <div class="table-responsive">
-      <table class="table table-striped table-hover">
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th>Customer</th>
-            <th>Contact</th>
-            <th>Service</th>
-            <th>Date & Time</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Contact</th>
+            <th scope="col">Service</th>
+            <th scope="col">Date &amp; time</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody id="bookingsTable">
@@ -92,7 +346,7 @@
             data-status="{{ booking.status }}"
             data-date="{{ booking.appointment_date|date:'Y-m-d' }}"
           >
-            <td>{{ booking.customer_name|default:"-" }}</td>
+            <td class="fw-semibold text-dark">{{ booking.customer_name|default:"—" }}</td>
             <td>
               <div>{{ booking.customer_phone }}</div>
               {% if booking.customer_email %}
@@ -101,35 +355,30 @@
             </td>
             <td>
               <div>{{ booking.service_name }}</div>
-              <div class="text-muted small">
-                Tsh{{ booking.price|default:"0" }}
-              </div>
+              <div class="text-muted small">TZS {{ booking.price|default:"0" }}</div>
             </td>
             <td>
-              <div>{{ booking.appointment_date|date:"M j, Y" }}</div>
-              <div class="text-muted small">
-                {{ booking.appointment_date|time }}
-              </div>
+              <div class="fw-medium">{{ booking.appointment_date|date:"M j, Y" }}</div>
+              <div class="text-muted small">{{ booking.appointment_date|time }}</div>
             </td>
             <td>
-              <span
-                class="badge {% if booking.status == 'pending' %}bg-warning {% elif booking.status == 'confirmed' %}bg-primary {% elif booking.status == 'completed' %}bg-success {% else %}bg-danger{% endif %}"
-              >
+              <span class="badge rounded-pill badge-status {% if booking.status == 'pending' %}text-bg-warning{% elif booking.status == 'confirmed' %}text-bg-primary{% elif booking.status == 'completed' %}text-bg-success{% else %}text-bg-danger{% endif %}">
                 {{ booking.get_status_display }}
               </span>
             </td>
-            <td>
-              <div class="d-flex">
-                <a href="{% url 'edit_booking' booking.id %}" class="btn btn-sm btn-primary me-1">
-                  <i class="fas fa-edit"></i> Edit
-              </a>
-                <button 
-                  class="btn btn-sm btn-danger" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#deleteModal" 
+            <td class="text-end">
+              <div class="btn-group btn-group-sm" role="group">
+                <a href="{% url 'saloon_admin:edit_booking' booking.id %}" class="btn btn-outline-primary rounded-start-3">
+                  <i class="bi bi-pencil-square me-1"></i> Edit
+                </a>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger rounded-end-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal"
                   data-booking-id="{{ booking.id }}"
                 >
-                  <i class="fas fa-trash">Delete</i>
+                  <i class="bi bi-trash me-1"></i> Delete
                 </button>
               </div>
             </td>
@@ -140,262 +389,187 @@
     </div>
   </div>
 
-  <!-- Mobile View -->
   <div class="d-lg-none">
-    <div class="row" id="mobileBookings">
-      {% for booking in bookings %}
-      <div
-        class="col-12 mb-3 booking-card"
-        data-status="{{ booking.status }}"
-        data-date="{{ booking.appointment_date|date:'Y-m-d' }}"
-      >
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <h5 class="card-title">
-                {{ booking.customer_name|default:"-" }}
-              </h5>
-              <span
-                class="badge {% if booking.status == 'pending' %}bg-warning {% elif booking.status == 'confirmed' %}bg-primary {% elif booking.status == 'completed' %}bg-success {% else %}bg-danger{% endif %}"
-              >
-                {{ booking.get_status_display }}
-              </span>
-            </div>
+    <div class="row g-3" id="mobileBookings">
+    {% for booking in bookings %}
+    <div
+      class="col-12 booking-card"
+      data-status="{{ booking.status }}"
+      data-date="{{ booking.appointment_date|date:'Y-m-d' }}"
+    >
+      <div class="card booking-mobile-card border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h3 class="h6 mb-0 fw-bold">{{ booking.customer_name|default:"—" }}</h3>
+            <span class="badge rounded-pill badge-status {% if booking.status == 'pending' %}text-bg-warning{% elif booking.status == 'confirmed' %}text-bg-primary{% elif booking.status == 'completed' %}text-bg-success{% else %}text-bg-danger{% endif %}">
+              {{ booking.get_status_display }}
+            </span>
+          </div>
 
-            <div class="row mt-2">
-              <div class="col-6">
-                <div class="text-muted small">Service</div>
-                <div>{{ booking.service_name }}</div>
-              </div>
-              <div class="col-6">
-                <div class="text-muted small">Price</div>
-                <div>Tsh{{ booking.price|default:"0" }}</div>
-              </div>
+          <div class="row g-2 small">
+            <div class="col-6">
+              <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Service</div>
+              <div>{{ booking.service_name }}</div>
             </div>
+            <div class="col-6">
+              <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Price</div>
+              <div class="fw-semibold">TZS {{ booking.price|default:"0" }}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Date</div>
+              <div>{{ booking.appointment_date|date:"M j, Y" }}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Time</div>
+              <div>{{ booking.appointment_date|time }}</div>
+            </div>
+            <div class="col-12">
+              <div class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.05em;">Phone</div>
+              <div>{{ booking.customer_phone }}</div>
+            </div>
+          </div>
 
-            <div class="row mt-2">
-              <div class="col-6">
-                <div class="text-muted small">Date</div>
-                <div>{{ booking.appointment_date|date:"M j, Y" }}</div>
-              </div>
-              <div class="col-6">
-                <div class="text-muted small">Time</div>
-                <div>{{ booking.appointment_date|time }}</div>
-              </div>
-            </div>
-
-            <div class="row mt-2">
-              <div class="col-6">
-                <div class="text-muted small">Phone</div>
-                <div>{{ booking.customer_phone }}</div>
-              </div>
-              <div class="col-6 text-end">
-                <div class="btn-group">
-                  <a href="{% url 'edit_booking' booking.id %}" class="btn btn-sm btn-primary me-1">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                  <button 
-                    class="btn btn-sm btn-danger" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#deleteModal" 
-                    data-booking-id="{{ booking.id }}"
-                  >
-                    <i class="fas fa-trash">Delete</i>
-                  </button>
-                </div>
-              </div>
-            </div>
+          <div class="d-flex gap-2 mt-3">
+            <a href="{% url 'saloon_admin:edit_booking' booking.id %}" class="btn btn-sm btn-primary flex-grow-1 rounded-3">
+              <i class="bi bi-pencil-square me-1"></i> Edit
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger flex-grow-1 rounded-3"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal"
+              data-booking-id="{{ booking.id }}"
+            >
+              <i class="bi bi-trash me-1"></i> Delete
+            </button>
           </div>
         </div>
       </div>
-      {% endfor %}
+    </div>
+    {% endfor %}
     </div>
   </div>
+  {% else %}
+  <div class="empty-state mb-4">
+    <i class="bi bi-inbox d-block mb-3"></i>
+    <h3 class="h5 fw-bold text-dark">No bookings yet</h3>
+    <p class="text-muted mb-0 small">New bookings from WhatsApp will show up here.</p>
+  </div>
+  {% endif %}
+</div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Confirm Deletion</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete this booking?</p>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
-          <form id="deleteForm" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Delete</button>
-          </form>
-        </div>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold" id="deleteModalLabel">Delete booking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <p class="text-muted mb-0">This cannot be undone. Are you sure you want to delete this booking?</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="POST" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger rounded-3">Delete</button>
+        </form>
       </div>
     </div>
   </div>
+</div>
+{% endblock %}
 
-  <style>
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .booking-card {
-        margin-bottom: 1rem;
-      }
-      .text-muted.small {
-        font-size: 0.75rem;
-      }
-      .btn-group .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-      }
-    }
-    .btn-group {
-      white-space: nowrap;
-    }
-  </style>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize status tabs (both desktop nav-tabs and mobile btn-group)
-      const statusTabs = document.querySelectorAll('#statusTabs .nav-link, .btn-group .btn[data-status]');
-      statusTabs.forEach(tab => {
-        tab.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          // Update active state for all tab types
-          document.querySelectorAll('#statusTabs .nav-link, .btn-group .btn').forEach(t => {
-            t.classList.remove('active');
-          });
-          this.classList.add('active');
-          
-          filterBookings();
+{% block extra_js %}
+<script>
+  var DELETE_BOOKING_URL_TEMPLATE = "{% url 'saloon_admin:delete_booking' 888888888 %}".replace('888888888', '__ID__');
+  document.addEventListener('DOMContentLoaded', function () {
+    const statusTabs = document.querySelectorAll('#statusTabs .nav-link');
+    statusTabs.forEach(function (tab) {
+      tab.addEventListener('click', function (e) {
+        e.preventDefault();
+        statusTabs.forEach(function (t) {
+          t.classList.remove('active');
         });
-      });
-  
-      // Initialize delete modal
-      var deleteModal = document.getElementById('deleteModal');
-      var deleteForm = document.getElementById('deleteForm');
-      if (deleteModal && deleteForm) {
-        deleteModal.addEventListener('show.bs.modal', function(event) {
-          var button = event.relatedTarget;
-          var bookingId = button.getAttribute('data-booking-id');
-          deleteForm.action = '/bookings/delete/' + bookingId + '/';
-        });
-      }
-  
-      // Initialize date filter
-      const dateFilter = document.getElementById('dateFilter');
-      if (dateFilter) {
-        dateFilter.addEventListener('change', filterBookings);
-      }
-    });
-  
-    function filterBookings() {
-      // Get active status filter (works with both nav-tabs and btn-group)
-      const activeStatusTab = document.querySelector('#statusTabs .nav-link.active, .btn-group .btn.active');
-      const statusFilter = activeStatusTab ? activeStatusTab.getAttribute('data-status') : 'all';
-      
-      const dateFilter = document.getElementById('dateFilter') ? document.getElementById('dateFilter').value : '';
-      const clearDateBtn = document.getElementById('clearDateFilter');
-      const clearFiltersBtn = document.getElementById('clearFilters');
-      
-      // Filter desktop table rows
-      const rows = document.querySelectorAll('.booking-row');
-      let visibleCount = 0;
-      
-      rows.forEach(row => {
-        const rowStatus = row.getAttribute('data-status');
-        const rowDate = row.getAttribute('data-date');
-        
-        const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
-        const dateMatch = !dateFilter || rowDate === dateFilter;
-        
-        if (statusMatch && dateMatch) {
-          row.style.display = '';
-          visibleCount++;
-        } else {
-          row.style.display = 'none';
-        }
-      });
-      
-      // Filter mobile cards
-      const cards = document.querySelectorAll('.booking-card');
-      cards.forEach(card => {
-        const cardStatus = card.getAttribute('data-status');
-        const cardDate = card.getAttribute('data-date');
-        
-        const statusMatch = statusFilter === 'all' || cardStatus === statusFilter;
-        const dateMatch = !dateFilter || cardDate === dateFilter;
-        
-        card.style.display = (statusMatch && dateMatch) ? '' : 'none';
-      });
-      
-      // Show/hide clear buttons
-      if (clearDateBtn) {
-        clearDateBtn.style.display = dateFilter ? '' : 'none';
-      }
-      if (clearFiltersBtn) {
-        clearFiltersBtn.style.display = dateFilter ? 'block' : 'none';
-      }
-      
-      // Handle empty state for both views
-      const emptyRow = document.querySelector('#bookingsTableBody tr:not(.booking-row)');
-      if (emptyRow) {
-        emptyRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
-      }
-      
-      const mobileContainer = document.getElementById('mobileBookings');
-      if (mobileContainer) {
-        const visibleCards = mobileContainer.querySelectorAll('.booking-card[style=""]');
-        const noResultsMobile = document.getElementById('noResultsMobile');
-        
-        if (!noResultsMobile && visibleCards.length === 0 && cards.length > 0) {
-          // Create no results message if none exists
-          const message = document.createElement('div');
-          message.id = 'noResultsMobile';
-          message.className = 'col-12 text-center py-4';
-          message.textContent = 'No bookings match your filters';
-          mobileContainer.appendChild(message);
-        } else if (noResultsMobile && visibleCards.length > 0) {
-          noResultsMobile.remove();
-        }
-      }
-    }
-  
-    function clearDateFilter() {
-      const dateFilter = document.getElementById('dateFilter');
-      if (dateFilter) {
-        dateFilter.value = '';
+        this.classList.add('active');
         filterBookings();
-      }
-      const clearBtn = document.getElementById('clearDateFilter');
-      if (clearBtn) clearBtn.style.display = 'none';
-    }
-  
-    function clearFilters() {
-      // Reset date filter
-      clearDateFilter();
-      
-      // Reset status filter to 'all'
-      document.querySelectorAll('#statusTabs .nav-link, .btn-group .btn').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.getAttribute('data-status') === 'all') {
-          tab.classList.add('active');
-        }
       });
-      
+    });
+
+    var deleteModal = document.getElementById('deleteModal');
+    var deleteForm = document.getElementById('deleteForm');
+    if (deleteModal && deleteForm) {
+      deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        if (!button) return;
+        var bookingId = button.getAttribute('data-booking-id');
+        deleteForm.action = DELETE_BOOKING_URL_TEMPLATE.replace('__ID__', bookingId);
+      });
+    }
+
+    var dateFilter = document.getElementById('dateFilter');
+    if (dateFilter) {
+      dateFilter.addEventListener('change', filterBookings);
+    }
+  });
+
+  function filterBookings() {
+    var activeTab = document.querySelector('#statusTabs .nav-link.active');
+    var statusFilter = activeTab ? activeTab.getAttribute('data-status') : 'all';
+    var dateEl = document.getElementById('dateFilter');
+    var dateFilter = dateEl ? dateEl.value : '';
+    var clearDateBtn = document.getElementById('clearDateFilter');
+
+    var rows = document.querySelectorAll('.booking-row');
+    rows.forEach(function (row) {
+      var rowStatus = row.getAttribute('data-status');
+      var rowDate = row.getAttribute('data-date');
+      var statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
+      var dateMatch = !dateFilter || rowDate === dateFilter;
+      row.style.display = statusMatch && dateMatch ? '' : 'none';
+    });
+
+    var cards = document.querySelectorAll('.booking-card');
+    var visibleCards = 0;
+    cards.forEach(function (card) {
+      var cardStatus = card.getAttribute('data-status');
+      var cardDate = card.getAttribute('data-date');
+      var statusMatch = statusFilter === 'all' || cardStatus === statusFilter;
+      var dateMatch = !dateFilter || cardDate === dateFilter;
+      var show = statusMatch && dateMatch;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCards += 1;
+    });
+
+    if (clearDateBtn) {
+      clearDateBtn.style.display = dateFilter ? '' : 'none';
+    }
+
+    var mobileContainer = document.getElementById('mobileBookings');
+    var noResultsMobile = document.getElementById('noResultsMobile');
+    if (mobileContainer && cards.length > 0) {
+      if (visibleCards === 0) {
+        if (!noResultsMobile) {
+          var message = document.createElement('div');
+          message.id = 'noResultsMobile';
+          message.className = 'col-12 text-center py-5 text-muted small';
+          message.innerHTML = '<i class="bi bi-funnel d-block fs-3 mb-2 opacity-50"></i>No bookings match your filters.';
+          mobileContainer.appendChild(message);
+        }
+      } else if (noResultsMobile) {
+        noResultsMobile.remove();
+      }
+    }
+  }
+
+  function clearDateFilter() {
+    var dateFilter = document.getElementById('dateFilter');
+    if (dateFilter) {
+      dateFilter.value = '';
       filterBookings();
     }
-  </script>
-</div>
+    var clearBtn = document.getElementById('clearDateFilter');
+    if (clearBtn) clearBtn.style.display = 'none';
+  }
+</script>
 {% endblock %}
