@@ -1951,12 +1951,21 @@ def confirm_booking(phone_number, session):
         if language == 'en':
             # English version of the confirmation message
             template = get_message('thibitisha_booking_link_en', 'en')
-            message = template.format(
-                service_type=booking_details.get('service_type', 'Service'),
-                service_name=booking_details.get('service_name', 'Selected Service'),
-                price=f"{booking_details.get('price', 0):,}",
-                booking_url=booking_url
-            )
+            if template:
+                message = template.format(
+                    service_type=booking_details.get('service_type', 'Service'),
+                    service_name=booking_details.get('service_name', 'Selected Service'),
+                    price=f"{booking_details.get('price', 0):,}",
+                    booking_url=booking_url
+                )
+            else:
+                message = (
+                    "✅ Booking Confirmed\n\n"
+                    f"Service: {booking_details.get('service_type', 'Service')} - "
+                    f"{booking_details.get('service_name', 'Selected Service')}\n"
+                    f"Price: Tsh {booking_details.get('price', 0):,}\n\n"
+                    f"Booking link:\n{booking_url}"
+                )
             
             # Additional English instructions
             message += "\n\nPlease click the link above to select your appointment date and time."
@@ -1964,12 +1973,21 @@ def confirm_booking(phone_number, session):
         else:
             # Swahili version of the confirmation message
             template = get_message('thibitisha_booking_link', 'sw')
-            message = template.format(
-                service_type=booking_details.get('service_type', 'Huduma'),
-                service_name=booking_details.get('service_name', 'Huduma Uliochagua'),
-                price=f"{booking_details.get('price', 0):,}",
-                booking_url=booking_url
-            )
+            if template:
+                message = template.format(
+                    service_type=booking_details.get('service_type', 'Huduma'),
+                    service_name=booking_details.get('service_name', 'Huduma Uliochagua'),
+                    price=f"{booking_details.get('price', 0):,}",
+                    booking_url=booking_url
+                )
+            else:
+                message = (
+                    "✅ Booking Imethibitishwa\n\n"
+                    f"Huduma: {booking_details.get('service_type', 'Huduma')} - "
+                    f"{booking_details.get('service_name', 'Huduma Uliochagua')}\n"
+                    f"Bei: Tsh {booking_details.get('price', 0):,}\n\n"
+                    f"Link ya booking:\n{booking_url}"
+                )
             
             # Additional Swahili instructions
             message += "\n\nTafadhali bofya kiungo hapo juu kuchagua tarehe na muda wa miadi yako."
