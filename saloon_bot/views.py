@@ -164,9 +164,15 @@ def initialize_user_session(phone_number):
     )
     
     if not created:
-        # Update last interaction time
+        # Ensure demo sessions always recover to an active, usable state.
+        if not session.is_active:
+            session.is_active = True
+            if not session.data:
+                session.data = {'booking_details': {}, 'current_options': []}
+            if not session.step:
+                session.step = MENU_STATES['MAIN']
         session.last_updated = timezone.now()
-        session.save(update_fields=['last_updated'])
+        session.save()
     
     return session
 
@@ -177,6 +183,12 @@ def is_clear_session_command(message):
 
 def handle_text_message_content(phone_number, message, session):
     text = message['text']['body'].strip().lower()
+
+    # Global navigation shortcuts for demo usability.
+    if text in ['menu', 'home', 'start']:
+        language = session.data.get('language', 'sw')
+        send_main_menu(phone_number, language)
+        return
     
     if session.step == "AWAITING_PAYMENT_PHONE":
         handle_payment_phone(phone_number, text)  # Process payment
@@ -231,7 +243,10 @@ def handle_text_message_content(phone_number, message, session):
     
     # Handle final confirmation after web form
     if text.startswith('confirm_'):
-        token = text.split('_')
+        token = text.replace('confirm_', '', 1).strip()
+        if not token:
+            send_text_message(phone_number, get_message('hakuna_booking'))
+            return
         try:
             temp_booking = TempBooking.objects.get(token=token, phone_number=phone_number)
             booking_data = json.loads(temp_booking.data)
@@ -333,7 +348,7 @@ def handle_list_selection(phone_number, selected_id, session):
         MENU_STATES['KUTOBOA']: handle_kutoboa_selection,
         MENU_STATES['KUOSHA']: handle_kuosha_selection,
         MENU_STATES['KUSUKA_STYLE']: handle_kusuka_style_selection,
-        MENU_STATES['HINA_PIKO']: handle_hina_selection
+        MENU_STATES['HINNA_PIKO']: handle_hina_selection
     }
     
     handler = menu_handlers.get(session.step)
@@ -937,7 +952,10 @@ def clear_session(phone_number):
     """Clear user session"""
     try:
         session = WhatsappSession.objects.get(phone_number=phone_number)
-        session.is_active = False
+        session.step = MENU_STATES['MAIN']
+        session.data = {'booking_details': {}, 'current_options': []}
+        session.is_active = True
+        session.last_updated = timezone.now()
         session.save()
         logger.info(f"Session cleared for {phone_number}")
     except WhatsappSession.DoesNotExist:
@@ -969,7 +987,9 @@ Choose service (1-9):
 6. Eyelashes
 7. Henna/Pico
 8. Piercing
-9. Hair Wash/Dry"""
+9. Hair Wash/Dry
+
+Type # anytime to reset session."""
 
         button_text = "Other Options:"
         
@@ -988,7 +1008,9 @@ Chagua huduma (1-9):
 6. Kope
 7. Hinna/Piko
 8. Kutoboa
-9. Kuosha/Kufumua"""
+9. Kuosha/Kufumua
+
+Tuma # muda wowote kuanza upya."""
 
         button_text = "Chagua Huduma nyingine:"
 
@@ -1029,6 +1051,8 @@ def handle_main_menu_selection(phone_number, text, session):
         choice = int(text.strip())
     except ValueError:
         current_lang = session.data.get('language', 'sw')
+        msg = "Please choose a number between 1 and 9." if current_lang == 'en' else "Tafadhali chagua namba kati ya 1 hadi 9."
+        send_text_message(phone_number, msg)
         send_main_menu(phone_number, current_lang)
         return
     
@@ -1131,7 +1155,7 @@ def send_hina_menu_en(phone_number):
     menu_text += "\n\nSend the number of the service you want:"
     
     send_text_message(phone_number, menu_text)
-    update_session_menu(phone_number, MENU_STATES['HINA_PIKO'])
+    update_session_menu(phone_number, MENU_STATES['HINNA_PIKO'])
     
     # Store services in session for reference
     session = WhatsappSession.objects.get(phone_number=phone_number)
