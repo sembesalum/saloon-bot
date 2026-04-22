@@ -78,6 +78,24 @@ SERVICE_TYPES = {
     'KUOSHA': 'Kuosha/Kufumua'
 }
 
+# Simplified demo catalog: numeric-only selection flow.
+SIMPLE_SERVICES = {
+    'sw': [
+        {"type": "Kusuka", "name": "Knotless Braids", "price": 35000},
+        {"type": "Natural Hair", "name": "Wash & Treatment", "price": 25000},
+        {"type": "Short Hair na Mawigi", "name": "Wig Installation", "price": 30000},
+        {"type": "Makeup", "name": "Simple Glam Makeup", "price": 40000},
+        {"type": "Kucha", "name": "Gel Nails", "price": 30000},
+    ],
+    'en': [
+        {"type": "Braiding", "name": "Knotless Braids", "price": 35000},
+        {"type": "Natural Hair", "name": "Wash & Treatment", "price": 25000},
+        {"type": "Short Hair & Wigs", "name": "Wig Installation", "price": 30000},
+        {"type": "Makeup", "name": "Simple Glam Makeup", "price": 40000},
+        {"type": "Nails", "name": "Gel Nails", "price": 30000},
+    ],
+}
+
 @csrf_exempt
 def webhook(request):
     """Handle WhatsApp webhook verification and incoming messages"""
@@ -194,16 +212,18 @@ def handle_text_message_content(phone_number, message, session):
         handle_payment_phone(phone_number, text)  # Process payment
         return 
     
-    # Handle confirmation response
+    # Handle confirmation response (numeric-only).
     if session.step == MENU_STATES['CONFIRMATION']:
-        if text in ['1', 'ndiyo', 'yes']:
+        if text == '1':
             confirm_booking(phone_number, session)
             return
-        elif text in ['2', 'hapana', 'no']:
+        elif text == '2':
             cancel_booking(phone_number, session)
             return
         else:
-            send_confirmation_prompt(phone_number, session)
+            lang = session.data.get('language', 'sw')
+            msg = "Reply with 1 to confirm or 2 to cancel." if lang == 'en' else "Jibu 1 kuthibitisha au 2 kusitisha."
+            send_text_message(phone_number, msg)
             return
     
     # Handle clear session command
@@ -216,30 +236,9 @@ def handle_text_message_content(phone_number, message, session):
     # Handle main menu selections
     if session.step == MENU_STATES['MAIN']:
         handle_main_menu_selection(phone_number, text, session)
-    
-    # Handle all sub-menu selections
-    elif session.step == MENU_STATES['NATURAL_HAIR']:
-        handle_natural_hair_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['SHORT_HAIR']:
-        handle_short_hair_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['MAKEUP']:
-        handle_makeup_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['KUCHA']:
-        handle_kucha_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['KOPE']:
-        handle_kope_selection(phone_number, text, session)
-    # elif session.step == MENU_STATES['NYUSI']:
-    #     handle_nyusi_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['KUTOBOA']:
-        handle_kutoboa_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['KUOSHA']:
-        handle_kuosha_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['HINNA_PIKO']:
-        handle_hina_selection(phone_number, text, session)
-    elif session.step == MENU_STATES['KUSUKA']:
-        handle_kusuka_text_selection(phone_number, text, session)
     else:
-        send_main_menu(phone_number)
+        # Any unexpected legacy step falls back to main menu.
+        send_main_menu(phone_number, session.data.get('language', 'sw'))
     
     # Handle final confirmation after web form
     if text.startswith('confirm_'):
@@ -548,12 +547,9 @@ def handle_button_reply(phone_number, button_id, session):
             new_lang = 'en' if language == 'sw' else 'sw'
             session.data['language'] = new_lang
             session.save()
-            
-            # Refresh current menu with new language
-            if session.step == MENU_STATES['KUSUKA']:
-                send_kusuka_menu(phone_number, new_lang)
-            else:
-                send_main_menu(phone_number, new_lang)
+
+            # Always return to simplified numeric main menu.
+            send_main_menu(phone_number, new_lang)
             return
             
         elif button_id == 'confirm_yes' and session.step == MENU_STATES['CONFIRMATION']:
@@ -566,6 +562,13 @@ def handle_button_reply(phone_number, button_id, session):
             
         elif button_id == 'confirm_no' and session.step == MENU_STATES['CONFIRMATION']:
             cancel_booking(phone_number, session)
+
+        # Backward-compatible mapping: if old confirmation buttons arrive, still work.
+        elif button_id in ['confirm_yes', 'confirm_no']:
+            if button_id == 'confirm_yes':
+                confirm_booking(phone_number, session)
+            else:
+                cancel_booking(phone_number, session)
             
         elif button_id == 'my_orders':
             handle_my_orders(phone_number)
@@ -963,56 +966,26 @@ def clear_session(phone_number):
 
 # --- Menu Navigation Functions ---
 def send_main_menu(phone_number, language='sw'):
-    """Send the main menu with language selection"""
+    """Send simplified main menu with numeric selections."""
     session = WhatsappSession.objects.get(phone_number=phone_number)
-    welcome_message_en = get_message("welcome_message_en")
-    welcome_message_sw = get_message("welcome_message_sw")
-    
-    # Store selected language in session
     session.data['language'] = language
+    session.data['current_services'] = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
+    session.step = MENU_STATES['MAIN']
     session.save()
-    
+
+    services = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
     if language == 'en':
-        # English version of the menu
-        welcome_message = welcome_message_en
-        
-        text_message = f"""{welcome_message}
-
-Choose service (1-9):
-1. Braiding Service
-2. Natural Hair
-3. Short Hair
-4. Makeup
-5. Nails
-6. Eyelashes
-7. Henna/Pico
-8. Piercing
-9. Hair Wash/Dry
-
-Type # anytime to reset session."""
-
-        button_text = "Other Options:"
-        
+        text_message = "✨ *Saloon Demo*\n\nChoose service by number:\n"
+        for idx, s in enumerate(services, start=1):
+            text_message += f"{idx}. {s['type']} - {s['name']} (Tsh {s['price']:,})\n"
+        text_message += "\nType # to reset anytime."
+        button_text = "Quick Actions"
     else:
-        # Swahili version (default)
-        welcome_message = welcome_message_sw
-        
-        text_message = f"""{welcome_message}
-
-Chagua huduma (1-9):
-1. Huduma ya Kusuka
-2. Natural Hair
-3. Short Hair Na Mawigi
-4. Makeup
-5. Kucha
-6. Kope
-7. Hinna/Piko
-8. Kutoboa
-9. Kuosha/Kufumua
-
-Tuma # muda wowote kuanza upya."""
-
-        button_text = "Chagua Huduma nyingine:"
+        text_message = "✨ *Saloon Demo*\n\nChagua huduma kwa namba:\n"
+        for idx, s in enumerate(services, start=1):
+            text_message += f"{idx}. {s['type']} - {s['name']} (Tsh {s['price']:,})\n"
+        text_message += "\nTuma # kuanza upya muda wowote."
+        button_text = "Vitendo vya Haraka"
 
     # Send the text menu first
     send_text_message(phone_number, text_message)
@@ -1046,43 +1019,61 @@ Tuma # muda wowote kuanza upya."""
     update_session_menu(phone_number, MENU_STATES['MAIN'])
 
 def handle_main_menu_selection(phone_number, text, session):
-    """Handle selection from main menu using numbers"""
+    """Handle simplified numeric selection from main menu."""
+    language = session.data.get('language', 'sw')
+    services = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
+
     try:
         choice = int(text.strip())
     except ValueError:
-        current_lang = session.data.get('language', 'sw')
-        msg = "Please choose a number between 1 and 9." if current_lang == 'en' else "Tafadhali chagua namba kati ya 1 hadi 9."
+        msg = (
+            f"Please choose a number between 1 and {len(services)}."
+            if language == 'en' else
+            f"Tafadhali chagua namba kati ya 1 hadi {len(services)}."
+        )
         send_text_message(phone_number, msg)
-        send_main_menu(phone_number, current_lang)
+        send_main_menu(phone_number, language)
         return
-    
-    menu_actions = {
-        0: lambda: send_help_message(phone_number),
-        1: lambda: send_kusuka_menu(phone_number, session.data.get('language', 'sw')),  # Updated to pass language
-        2: lambda: send_natural_hair_menu(phone_number, session.data.get('language', 'sw')),
-        3: lambda: send_short_hair_menu(phone_number, session.data.get('language', 'sw')),
-        4: lambda: send_makeup_menu(phone_number, session.data.get('language', 'sw')),
-        5: lambda: send_kucha_menu(phone_number, session.data.get('language', 'sw')),  # Updated
-        6: lambda: send_kope_menu(phone_number, session.data.get('language', 'sw')),   # Updated
-        # 7: lambda: send_nyusi_menu(phone_number, session.data.get('language', 'sw')),
-        7: lambda: send_hina_menu(phone_number, session.data.get('language', 'sw')),
-        8: lambda: send_kutoboa_menu(phone_number, session.data.get('language', 'sw')), # Updated
-        9: lambda: send_kuosha_menu(phone_number, session.data.get('language', 'sw'))  # Updated
+
+    if not (1 <= choice <= len(services)):
+        msg = (
+            f"Invalid number. Send a number between 1 and {len(services)}."
+            if language == 'en' else
+            f"Namba si sahihi. Tuma namba kati ya 1 na {len(services)}."
+        )
+        send_text_message(phone_number, msg)
+        send_main_menu(phone_number, language)
+        return
+
+    selected_service = services[choice - 1]
+    session.data['booking_details'] = {
+        'service_type': selected_service['type'],
+        'service_name': selected_service['name'],
+        'price': selected_service['price']
     }
-    
-    action = menu_actions.get(choice)
-    if action:
-        try:
-            action()
-        except Exception as e:
-            logger.error(f"Main menu action failed for choice {choice}: {str(e)}", exc_info=True)
-            current_lang = session.data.get('language', 'sw')
-            fallback = "Sorry, something went wrong. Returning to main menu." if current_lang == 'en' else "Samahani, kuna hitilafu. Tunakurudisha menu kuu."
-            send_text_message(phone_number, fallback)
-            send_main_menu(phone_number, current_lang)
+    session.step = MENU_STATES['CONFIRMATION']
+    session.save()
+
+    if language == 'en':
+        message = (
+            f"🧾 Confirm Booking\n\n"
+            f"Service: {selected_service['type']} - {selected_service['name']}\n"
+            f"Price: Tsh {selected_service['price']:,}\n\n"
+            f"Reply with:\n"
+            f"1. Confirm\n"
+            f"2. Cancel"
+        )
     else:
-        send_text_message(phone_number, get_message("namba_si_sahihi"))
-        send_main_menu(phone_number)
+        message = (
+            f"🧾 Thibitisha Booking\n\n"
+            f"Huduma: {selected_service['type']} - {selected_service['name']}\n"
+            f"Bei: Tsh {selected_service['price']:,}\n\n"
+            f"Jibu:\n"
+            f"1. Thibitisha\n"
+            f"2. Sitisha"
+        )
+
+    send_text_message(phone_number, message)
         
 def send_hina_menu(phone_number, language='sw'):
     """Send Kusuka menu in selected language"""
