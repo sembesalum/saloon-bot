@@ -96,6 +96,187 @@ SIMPLE_SERVICES = {
     ],
 }
 
+SIMPLE_CATEGORY_MENUS = {
+    'sw': {
+        MENU_STATES['KUSUKA']: {
+            'title': "Mitindo ya Kusuka",
+            'service_type': "Huduma ya Kusuka",
+            'items': [
+                {"name": "Knotless Braids", "price": 35000},
+                {"name": "Invisible Locs", "price": 40000},
+                {"name": "Stitches/Cornrows", "price": 30000},
+            ],
+        },
+        MENU_STATES['NATURAL_HAIR']: {
+            'title': "Natural Hair",
+            'service_type': "Natural Hair",
+            'items': [
+                {"name": "Wash and Go", "price": 25000},
+                {"name": "Twist Out", "price": 30000},
+                {"name": "Deep Conditioning", "price": 20000},
+            ],
+        },
+        MENU_STATES['SHORT_HAIR']: {
+            'title': "Short Hair na Mawigi",
+            'service_type': "Short Hair Na Mawigi",
+            'items': [
+                {"name": "Wig Installation", "price": 30000},
+                {"name": "Short Wig Styling", "price": 25000},
+                {"name": "Wig Wash + Set", "price": 20000},
+            ],
+        },
+        MENU_STATES['MAKEUP']: {
+            'title': "Makeup",
+            'service_type': "Makeup",
+            'items': [
+                {"name": "Simple Glam", "price": 40000},
+                {"name": "Bridal Makeup", "price": 70000},
+                {"name": "Soft Beat", "price": 35000},
+            ],
+        },
+        MENU_STATES['KUCHA']: {
+            'title': "Kucha",
+            'service_type': "Kucha",
+            'items': [
+                {"name": "Gel Nails", "price": 30000},
+                {"name": "Acrylic Set", "price": 35000},
+                {"name": "Manicure + Pedicure", "price": 25000},
+            ],
+        },
+        MENU_STATES['KOPE']: {
+            'title': "Kope",
+            'service_type': "Kope",
+            'items': [
+                {"name": "Classic Lashes", "price": 30000},
+                {"name": "Volume Lashes", "price": 40000},
+                {"name": "Lash Refill", "price": 20000},
+            ],
+        },
+        MENU_STATES['HINNA_PIKO']: {
+            'title': "Hinna/Piko",
+            'service_type': "Hinna/Piko",
+            'items': [
+                {"name": "Mkono Mmoja", "price": 15000},
+                {"name": "Mikono Miwili", "price": 25000},
+                {"name": "Design Maalum", "price": 30000},
+            ],
+        },
+        MENU_STATES['KUTOBOA']: {
+            'title': "Kutoboa",
+            'service_type': "Kutoboa",
+            'items': [
+                {"name": "Kutoboa Sikio", "price": 10000},
+                {"name": "Kutoboa Pua", "price": 15000},
+                {"name": "Kutoboa Kitovu", "price": 25000},
+            ],
+        },
+        MENU_STATES['KUOSHA']: {
+            'title': "Kuosha/Kufumua",
+            'service_type': "Kuosha/Kufumua",
+            'items': [
+                {"name": "Kuosha Nywele", "price": 15000},
+                {"name": "Kufumua", "price": 20000},
+                {"name": "Kuosha + Blow Dry", "price": 25000},
+            ],
+        },
+    },
+    'en': {
+        MENU_STATES['KUSUKA']: {
+            'title': "Braiding Styles",
+            'service_type': "Braiding",
+            'items': [
+                {"name": "Knotless Braids", "price": 35000},
+                {"name": "Invisible Locs", "price": 40000},
+                {"name": "Stitches/Cornrows", "price": 30000},
+            ],
+        },
+        MENU_STATES['NATURAL_HAIR']: {
+            'title': "Natural Hair",
+            'service_type': "Natural Hair",
+            'items': [
+                {"name": "Wash and Go", "price": 25000},
+                {"name": "Twist Out", "price": 30000},
+                {"name": "Deep Conditioning", "price": 20000},
+            ],
+        },
+        MENU_STATES['SHORT_HAIR']: {
+            'title': "Short Hair & Wigs",
+            'service_type': "Short Hair & Wigs",
+            'items': [
+                {"name": "Wig Installation", "price": 30000},
+                {"name": "Short Wig Styling", "price": 25000},
+                {"name": "Wig Wash + Set", "price": 20000},
+            ],
+        },
+        MENU_STATES['MAKEUP']: {
+            'title': "Makeup",
+            'service_type': "Makeup",
+            'items': [
+                {"name": "Simple Glam", "price": 40000},
+                {"name": "Bridal Makeup", "price": 70000},
+                {"name": "Soft Beat", "price": 35000},
+            ],
+        },
+        MENU_STATES['KUCHA']: {
+            'title': "Nails",
+            'service_type': "Nails",
+            'items': [
+                {"name": "Gel Nails", "price": 30000},
+                {"name": "Acrylic Set", "price": 35000},
+                {"name": "Manicure + Pedicure", "price": 25000},
+            ],
+        },
+        MENU_STATES['KOPE']: {
+            'title': "Eyelashes",
+            'service_type': "Eyelashes",
+            'items': [
+                {"name": "Classic Lashes", "price": 30000},
+                {"name": "Volume Lashes", "price": 40000},
+                {"name": "Lash Refill", "price": 20000},
+            ],
+        },
+        MENU_STATES['HINNA_PIKO']: {
+            'title': "Henna/Pico",
+            'service_type': "Henna/Pico",
+            'items': [
+                {"name": "One Hand", "price": 15000},
+                {"name": "Two Hands", "price": 25000},
+                {"name": "Custom Design", "price": 30000},
+            ],
+        },
+        MENU_STATES['KUTOBOA']: {
+            'title': "Piercing",
+            'service_type': "Piercing",
+            'items': [
+                {"name": "Ear Piercing", "price": 10000},
+                {"name": "Nose Piercing", "price": 15000},
+                {"name": "Navel Piercing", "price": 25000},
+            ],
+        },
+        MENU_STATES['KUOSHA']: {
+            'title': "Wash/Take Down",
+            'service_type': "Wash/Take Down",
+            'items': [
+                {"name": "Hair Wash", "price": 15000},
+                {"name": "Take Down", "price": 20000},
+                {"name": "Wash + Blow Dry", "price": 25000},
+            ],
+        },
+    },
+}
+
+MAIN_MENU_MAP = {
+    1: MENU_STATES['KUSUKA'],
+    2: MENU_STATES['NATURAL_HAIR'],
+    3: MENU_STATES['SHORT_HAIR'],
+    4: MENU_STATES['MAKEUP'],
+    5: MENU_STATES['KUCHA'],
+    6: MENU_STATES['KOPE'],
+    7: MENU_STATES['HINNA_PIKO'],
+    8: MENU_STATES['KUTOBOA'],
+    9: MENU_STATES['KUOSHA'],
+}
+
 @csrf_exempt
 def webhook(request):
     """Handle WhatsApp webhook verification and incoming messages"""
@@ -236,6 +417,8 @@ def handle_text_message_content(phone_number, message, session):
     # Handle main menu selections
     if session.step == MENU_STATES['MAIN']:
         handle_main_menu_selection(phone_number, text, session)
+    elif session.step in SIMPLE_CATEGORY_MENUS.get(session.data.get('language', 'sw'), {}):
+        handle_simple_category_selection(phone_number, text, session)
     else:
         # Any unexpected legacy step falls back to main menu.
         send_main_menu(phone_number, session.data.get('language', 'sw'))
@@ -548,8 +731,11 @@ def handle_button_reply(phone_number, button_id, session):
             session.data['language'] = new_lang
             session.save()
 
-            # Always return to simplified numeric main menu.
-            send_main_menu(phone_number, new_lang)
+            # Refresh current category menu when possible, otherwise main menu.
+            if session.step in SIMPLE_CATEGORY_MENUS.get(language, {}):
+                send_simple_category_menu(phone_number, session.step, new_lang)
+            else:
+                send_main_menu(phone_number, new_lang)
             return
             
         elif button_id == 'confirm_yes' and session.step == MENU_STATES['CONFIRMATION']:
@@ -966,25 +1152,44 @@ def clear_session(phone_number):
 
 # --- Menu Navigation Functions ---
 def send_main_menu(phone_number, language='sw'):
-    """Send simplified main menu with numeric selections."""
+    """Send full 1-9 numeric main menu."""
     session = WhatsappSession.objects.get(phone_number=phone_number)
     session.data['language'] = language
     session.data['current_services'] = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
     session.step = MENU_STATES['MAIN']
     session.save()
 
-    services = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
     if language == 'en':
-        text_message = "✨ *Saloon Demo*\n\nChoose service by number:\n"
-        for idx, s in enumerate(services, start=1):
-            text_message += f"{idx}. {s['type']} - {s['name']} (Tsh {s['price']:,})\n"
-        text_message += "\nType # to reset anytime."
+        text_message = (
+            "✨ *Saloon Demo*\n\n"
+            "Choose service (1-9):\n"
+            "1. Braiding Service\n"
+            "2. Natural Hair\n"
+            "3. Short Hair & Wigs\n"
+            "4. Makeup\n"
+            "5. Nails\n"
+            "6. Eyelashes\n"
+            "7. Henna/Pico\n"
+            "8. Piercing\n"
+            "9. Hair Wash/Take Down\n\n"
+            "Type # to reset anytime."
+        )
         button_text = "Quick Actions"
     else:
-        text_message = "✨ *Saloon Demo*\n\nChagua huduma kwa namba:\n"
-        for idx, s in enumerate(services, start=1):
-            text_message += f"{idx}. {s['type']} - {s['name']} (Tsh {s['price']:,})\n"
-        text_message += "\nTuma # kuanza upya muda wowote."
+        text_message = (
+            "✨ *Saloon Demo*\n\n"
+            "Chagua huduma (1-9):\n"
+            "1. Huduma ya Kusuka\n"
+            "2. Natural Hair\n"
+            "3. Short Hair Na Mawigi\n"
+            "4. Makeup\n"
+            "5. Kucha\n"
+            "6. Kope\n"
+            "7. Hinna/Piko\n"
+            "8. Kutoboa\n"
+            "9. Kuosha/Kufumua\n\n"
+            "Tuma # kuanza upya muda wowote."
+        )
         button_text = "Vitendo vya Haraka"
 
     # Send the text menu first
@@ -1019,9 +1224,64 @@ def send_main_menu(phone_number, language='sw'):
     update_session_menu(phone_number, MENU_STATES['MAIN'])
 
 def handle_main_menu_selection(phone_number, text, session):
-    """Handle simplified numeric selection from main menu."""
+    """Handle full 1-9 numeric main menu and open selected category menu."""
     language = session.data.get('language', 'sw')
-    services = SIMPLE_SERVICES.get(language, SIMPLE_SERVICES['sw'])
+
+    try:
+        choice = int(text.strip())
+    except ValueError:
+        msg = (
+            "Please choose a number between 1 and 9."
+            if language == 'en' else
+            "Tafadhali chagua namba kati ya 1 hadi 9."
+        )
+        send_text_message(phone_number, msg)
+        send_main_menu(phone_number, language)
+        return
+
+    if choice not in MAIN_MENU_MAP:
+        msg = (
+            "Invalid number. Send a number between 1 and 9."
+            if language == 'en' else
+            "Namba si sahihi. Tuma namba kati ya 1 na 9."
+        )
+        send_text_message(phone_number, msg)
+        send_main_menu(phone_number, language)
+        return
+
+    send_simple_category_menu(phone_number, MAIN_MENU_MAP[choice], language)
+
+def send_simple_category_menu(phone_number, menu_state, language):
+    category = SIMPLE_CATEGORY_MENUS.get(language, SIMPLE_CATEGORY_MENUS['sw']).get(menu_state)
+    if not category:
+        send_main_menu(phone_number, language)
+        return
+
+    menu_text = f"📌 {category['title']}\n\n"
+    for idx, item in enumerate(category['items'], start=1):
+        menu_text += f"{idx}. {item['name']} - Tsh {item['price']:,}\n"
+    menu_text += "\n"
+    menu_text += "Reply with number of style." if language == 'en' else "Jibu na namba ya mtindo."
+    menu_text += "\n"
+    menu_text += "Type # to go back to main menu." if language == 'en' else "Tuma # kurudi menu kuu."
+
+    session = WhatsappSession.objects.get(phone_number=phone_number)
+    session.step = menu_state
+    session.data['current_services'] = category['items']
+    session.data['current_service_type'] = category['service_type']
+    session.data['language'] = language
+    session.save()
+
+    send_text_message(phone_number, menu_text)
+
+def handle_simple_category_selection(phone_number, text, session):
+    language = session.data.get('language', 'sw')
+    services = session.data.get('current_services', [])
+    service_type = session.data.get('current_service_type', 'Service')
+
+    if not services:
+        send_main_menu(phone_number, language)
+        return
 
     try:
         choice = int(text.strip())
@@ -1029,10 +1289,9 @@ def handle_main_menu_selection(phone_number, text, session):
         msg = (
             f"Please choose a number between 1 and {len(services)}."
             if language == 'en' else
-            f"Tafadhali chagua namba kati ya 1 hadi {len(services)}."
+            f"Tafadhali chagua namba kati ya 1 na {len(services)}."
         )
         send_text_message(phone_number, msg)
-        send_main_menu(phone_number, language)
         return
 
     if not (1 <= choice <= len(services)):
@@ -1042,14 +1301,13 @@ def handle_main_menu_selection(phone_number, text, session):
             f"Namba si sahihi. Tuma namba kati ya 1 na {len(services)}."
         )
         send_text_message(phone_number, msg)
-        send_main_menu(phone_number, language)
         return
 
-    selected_service = services[choice - 1]
+    selected = services[choice - 1]
     session.data['booking_details'] = {
-        'service_type': selected_service['type'],
-        'service_name': selected_service['name'],
-        'price': selected_service['price']
+        'service_type': service_type,
+        'service_name': selected['name'],
+        'price': selected['price']
     }
     session.step = MENU_STATES['CONFIRMATION']
     session.save()
@@ -1057,8 +1315,8 @@ def handle_main_menu_selection(phone_number, text, session):
     if language == 'en':
         message = (
             f"🧾 Confirm Booking\n\n"
-            f"Service: {selected_service['type']} - {selected_service['name']}\n"
-            f"Price: Tsh {selected_service['price']:,}\n\n"
+            f"Service: {service_type} - {selected['name']}\n"
+            f"Price: Tsh {selected['price']:,}\n\n"
             f"Reply with:\n"
             f"1. Confirm\n"
             f"2. Cancel"
@@ -1066,8 +1324,8 @@ def handle_main_menu_selection(phone_number, text, session):
     else:
         message = (
             f"🧾 Thibitisha Booking\n\n"
-            f"Huduma: {selected_service['type']} - {selected_service['name']}\n"
-            f"Bei: Tsh {selected_service['price']:,}\n\n"
+            f"Huduma: {service_type} - {selected['name']}\n"
+            f"Bei: Tsh {selected['price']:,}\n\n"
             f"Jibu:\n"
             f"1. Thibitisha\n"
             f"2. Sitisha"
