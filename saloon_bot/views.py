@@ -1805,6 +1805,13 @@ def update_session_menu(phone_number, menu_state):
 # --- Message Sending Functions ---
 def _send_text_message_once(phone_number, text):
     """Send one text message payload without splitting."""
+    if text is None:
+        text = ""
+    text = str(text).strip()
+    if not text:
+        # WhatsApp rejects empty text.body. Keep webhook stable.
+        text = "⚠️ Message unavailable. Please choose from the menu again."
+
     payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -1844,7 +1851,10 @@ def send_text_message(phone_number, text):
     if text is None:
         text = ""
 
-    text = str(text)
+    text = str(text).strip()
+    if not text:
+        text = "⚠️ Message unavailable. Please choose from the menu again."
+
     if len(text) <= 3200:
         return _send_text_message_once(phone_number, text)
 
@@ -1948,7 +1958,8 @@ def whatsapp_api_call(payload):
         print(f"[ERROR] API Request failed: {str(e)}")
         if hasattr(e, 'response') and e.response:
             print(f"[ERROR] Response content: {e.response.text}")
-        raise ValueError("Failed to send WhatsApp message")
+        # Do not crash webhook processing for send failures.
+        return None
 
 
 def send_short_hair_menu(phone_number, language='sw'):
