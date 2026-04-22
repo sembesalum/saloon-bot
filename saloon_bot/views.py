@@ -2016,34 +2016,64 @@ def confirm_booking(phone_number, session):
 
 
 def handle_lipa_sasa(phone_number, session=None):
-    """Unified payment handler for both languages"""
+    """Demo payment: mark latest booking as paid immediately."""
     try:
-        # Get language from session or default to Swahili
         language = session.data.get('language', 'sw') if session else 'sw'
-        
-        # Get the latest booking
         booking = Booking.objects.filter(customer_phone=phone_number).order_by('-created_at').first()
-        
-        if not booking or not booking.price:
-            send_text_message(phone_number, get_message('hakuna_booking', language))
+
+        if not booking:
+            msg = "No order found yet. Please make a booking first." if language == 'en' else "Hakuna oda bado. Tafadhali fanya booking kwanza."
+            send_text_message(phone_number, msg)
             return send_main_menu(phone_number, language)
-            
+
+        amount = float(booking.price or 0)
+        demo_order_id = f"DEMO-{booking.id}-{int(timezone.now().timestamp())}"
+
+        # Demo mode: instantly mark booking/order as paid-completed.
+        booking.status = 'completed'
+        booking.save()
+
+        if session is None:
+            try:
+                session = WhatsappSession.objects.get(phone_number=phone_number)
+            except WhatsappSession.DoesNotExist:
+                session = None
+
+        if session:
+            session.step = MENU_STATES['MAIN']
+            session.data['payment_info'] = {
+                'payment_phone': phone_number,
+                'amount': amount,
+                'transaction_id': demo_order_id,
+                'status': 'completed'
+            }
+            session.save()
+
         if language == 'en':
-            message = "Please enter your payment phone number (e.g., 0757123456):"
+            message = (
+                "✅ Demo payment completed\n\n"
+                f"Order ID: {demo_order_id}\n"
+                f"Service: {booking.service_name}\n"
+                f"Amount: Tsh {amount:,.0f}\n"
+                f"Status: Paid\n\n"
+                "This is demo mode (no real charge)."
+            )
         else:
-            message = get_message('ingiza_namba_ya_simu')
-        
+            message = (
+                "✅ Malipo ya demo yamekamilika\n\n"
+                f"Namba ya Oda: {demo_order_id}\n"
+                f"Huduma: {booking.service_name}\n"
+                f"Kiasi: Tsh {amount:,.0f}\n"
+                f"Hali: Imelipwa\n\n"
+                "Hii ni demo (hakuna malipo halisi)."
+            )
+
         send_text_message(phone_number, message)
-        
-        # Update session to expect payment phone
-        session = WhatsappSession.objects.get(phone_number=phone_number)
-        session.step = "AWAITING_PAYMENT_PHONE"
-        session.data['payment_amount'] = float(booking.price)  # Convert Decimal to float
-        session.save()
+        send_main_menu(phone_number, language)
         
     except Exception as e:
         logger.error(f"Error initiating payment: {str(e)}")
-        error_msg = get_message('hitilafu', language)
+        error_msg = "Sorry, payment failed. Please try again." if language == 'en' else "Samahani, malipo hayakukamilika. Tafadhali jaribu tena."
         send_text_message(phone_number, error_msg)
         
 def cancel_booking(phone_number, session):
