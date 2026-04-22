@@ -414,7 +414,7 @@ def send_natural_hair_menu_sw(phone_number):
         menu_text += f"\n{i}. {service['name']} - Tsh {formatted_price}"
     menu_text += "\n\nTuma namba ya huduma unayotaka:"
 
-    send_text_message(phone_number, menu_text)
+    send_chunked_text_message(phone_number, menu_text)
     update_session_menu(phone_number, MENU_STATES['NATURAL_HAIR'])
 
     # Store available services in session
@@ -462,7 +462,7 @@ def send_natural_hair_menu_en(phone_number):
         menu_text += f"\n{i}. {service['name']} - Tsh {formatted_price}"
     menu_text += "\n\nSend the number of the service you want:"
 
-    send_text_message(phone_number, menu_text)
+    send_chunked_text_message(phone_number, menu_text)
     update_session_menu(phone_number, MENU_STATES['NATURAL_HAIR'])
 
     # Store available services in session
@@ -1072,7 +1072,14 @@ def handle_main_menu_selection(phone_number, text, session):
     
     action = menu_actions.get(choice)
     if action:
-        action()
+        try:
+            action()
+        except Exception as e:
+            logger.error(f"Main menu action failed for choice {choice}: {str(e)}", exc_info=True)
+            current_lang = session.data.get('language', 'sw')
+            fallback = "Sorry, something went wrong. Returning to main menu." if current_lang == 'en' else "Samahani, kuna hitilafu. Tunakurudisha menu kuu."
+            send_text_message(phone_number, fallback)
+            send_main_menu(phone_number, current_lang)
     else:
         send_text_message(phone_number, get_message("namba_si_sahihi"))
         send_main_menu(phone_number)
@@ -1368,7 +1375,7 @@ def send_kusuka_menu_sw(phone_number):
         menu_text += f"{i}. {service['name']} - Tsh {service['price']:,}\n"
     menu_text += "\nKURUDI MENU KUU BONYEZA #"
     
-    send_text_message(phone_number, menu_text)
+    send_chunked_text_message(phone_number, menu_text)
     update_session_menu(phone_number, MENU_STATES['KUSUKA'])
     
     # Store services in session for reference
@@ -1511,7 +1518,7 @@ def send_kusuka_menu_en(phone_number):
         menu_text += f"{i}. {service['name']} - Tsh {service['price']:,}\n"
     menu_text += "\nTO RETURN TO MAIN MENU PRESS #"
     
-    send_text_message(phone_number, menu_text)
+    send_chunked_text_message(phone_number, menu_text)
     update_session_menu(phone_number, MENU_STATES['KUSUKA'])
     
     # Store services in session for reference
@@ -1806,6 +1813,31 @@ def send_text_message(phone_number, text):
         "text": {"body": text}
     }
     return whatsapp_api_call(payload)
+
+def send_chunked_text_message(phone_number, text, max_chars=3200):
+    """Send long text safely in WhatsApp-sized chunks."""
+    if not text:
+        return
+
+    lines = text.splitlines()
+    chunk = ""
+    for line in lines:
+        candidate = f"{chunk}\n{line}".strip() if chunk else line
+        if len(candidate) <= max_chars:
+            chunk = candidate
+            continue
+
+        if chunk:
+            send_text_message(phone_number, chunk)
+            chunk = line
+        else:
+            # Single line too long; hard split.
+            for i in range(0, len(line), max_chars):
+                send_text_message(phone_number, line[i:i + max_chars])
+            chunk = ""
+
+    if chunk:
+        send_text_message(phone_number, chunk)
 
 def send_list_message(phone_number, text, button_text, sections):
     """Send interactive list message"""
