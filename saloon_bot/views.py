@@ -1803,8 +1803,8 @@ def update_session_menu(phone_number, menu_state):
         pass
 
 # --- Message Sending Functions ---
-def send_text_message(phone_number, text):
-    """Send simple text message"""
+def _send_text_message_once(phone_number, text):
+    """Send one text message payload without splitting."""
     payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
@@ -1828,16 +1828,27 @@ def send_chunked_text_message(phone_number, text, max_chars=3200):
             continue
 
         if chunk:
-            send_text_message(phone_number, chunk)
+            _send_text_message_once(phone_number, chunk)
             chunk = line
         else:
             # Single line too long; hard split.
             for i in range(0, len(line), max_chars):
-                send_text_message(phone_number, line[i:i + max_chars])
+                _send_text_message_once(phone_number, line[i:i + max_chars])
             chunk = ""
 
     if chunk:
-        send_text_message(phone_number, chunk)
+        _send_text_message_once(phone_number, chunk)
+
+def send_text_message(phone_number, text):
+    """Send text message, auto-splitting long content for WhatsApp limits."""
+    if text is None:
+        text = ""
+
+    text = str(text)
+    if len(text) <= 3200:
+        return _send_text_message_once(phone_number, text)
+
+    send_chunked_text_message(phone_number, text, max_chars=3200)
 
 def send_list_message(phone_number, text, button_text, sections):
     """Send interactive list message"""
