@@ -382,11 +382,17 @@ def is_clear_session_command(message):
 
 def handle_text_message_content(phone_number, message, session):
     text = message['text']['body'].strip().lower()
+    normalized_text = " ".join(text.split())
 
     # Global navigation shortcuts for demo usability.
-    if text in ['menu', 'home', 'start']:
+    if normalized_text in ['menu', 'home', 'start']:
         language = session.data.get('language', 'sw')
         send_main_menu(phone_number, language)
+        return
+
+    # Quick actions should work from any step, not only interactive buttons.
+    if normalized_text in ['oda yangu', 'my order', 'my orders']:
+        handle_my_orders(phone_number)
         return
     
     if session.step == "AWAITING_PAYMENT_PHONE":
